@@ -7,14 +7,38 @@ class Parser;
 
 // Terminals
 terminal ASSIG;
+terminal COLON;
 terminal PLUS;
 terminal SUB;
 terminal MULT;
 terminal DIV;
+terminal GREATER;
+terminal LESSER;
+terminal GREATER_EQ;
+terminal LESSER_EQ;
+terminal EQUAL;
 terminal OPEN_BRACKET;
 terminal CLOSE_BRACKET;
+terminal OPEN_CURLY_BRACKET;
+terminal CLOSE_CURLY_BRACKET;
 terminal INTEGER_CONSTANT;
+terminal STRING_CONSTANT;
+terminal FLOAT_CONSTANT;
 terminal IDENTIFIER;
+terminal COMA;
+terminal CYCLE; // palabra reservada "ciclo"
+terminal CONDITIONAL; // palabra reservada "if"
+terminal OPTION; //palabra reservada "else"
+terminal RESERVED_FLOAT; //palabra reservada "Float"
+terminal RESERVED_INT; //palabra reservada "Int"
+terminal RESERVED_STRING; //palabra reservada "String"
+terminal INIT;
+terminal WRITE;
+terminal READ;
+terminal AND;
+terminal OR;
+terminal NOT;
+
 
 // Non Terminals
 non terminal sentence;

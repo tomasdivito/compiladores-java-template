@@ -1,5 +1,8 @@
 package lyc.compiler;
 
+import SymbolTableGenerator.DataType;
+import SymbolTableGenerator.SymbolEntry;
+import SymbolTableGenerator.SymbolTableManager;
 import java_cup.runtime.Symbol;
 import lyc.compiler.ParserSym;
 import lyc.compiler.model.*;
@@ -99,18 +102,33 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
   {ReservedWrite}                           { return symbol(ParserSym.WRITE); }
   /* identifiers */
   {Identifier}                             {
-                                              if(yytext().length() > MAX_LENGHT) {
-                                                throw new InvalidLengthException("Identifier out of bounds");
-                                              }
+                                                  if(yytext().length() > MAX_LENGHT) {
+                                                    throw new InvalidLengthException("Identifier out of bounds");
+                                                  }
 
-                                              return symbol(ParserSym.IDENTIFIER, yytext()); }
+                                                  if (!SymbolTableManager.exists(yytext())) {
+                                                      SymbolEntry entry = new SymbolEntry(yytext());
+                                                      SymbolTableManager.insert(entry);
+                                                  }
+
+                                                  return symbol(ParserSym.IDENTIFIER, yytext()); }
   /* Constants */
   {IntegerConstant}                        {
-                                                if(Long.valueOf(yytext()) > MAX_INTEGER_LENGTH || (Long.valueOf(yytext()) < MIN_INTEGER_LENGTH)) {
-                                                throw new InvalidIntegerException("Integer out of bounds.");
+                                                  if (Long.valueOf(yytext()) > MAX_INTEGER_LENGTH || (Long.valueOf(yytext()) < MIN_INTEGER_LENGTH)) {
+                                                      throw new InvalidIntegerException("Integer out of bounds.");
+                                                  }
+
+                                                  if (!SymbolTableManager.exists(yytext())) {
+                                                      SymbolEntry entry = new SymbolEntry(
+                                                              "_"+yytext(),
+                                                              DataType.INTEGER_CONST,
+                                                              yytext()
+                                                      );
+                                                      SymbolTableManager.insert(entry);
+                                                  }
+
+                                                  return symbol(ParserSym.INTEGER_CONSTANT, yytext());
                                              }
-                                             return symbol(ParserSym.INTEGER_CONSTANT, yytext());
-                                           }
 
   {FloatConstant}                          { return symbol(ParserSym.FLOAT_CONSTANT, yytext()); }
   {StringConstant}                         {
@@ -122,11 +140,11 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
                                                      stringBuffer.replace(0, 1, "");
                                                      stringBuffer.replace(stringBuffer.length()-1,stringBuffer.length(), "");
 
-                                                     /*if(!SymbolTableManager.existsInTable(yytext()))
+                                                     if(!SymbolTableManager.exists(yytext()))
                                                      {
-                                                       SymbolEntry entry = new SymbolEntry("_" + stringBuffer.toString().replace(" ","_"), DataType.STRING_CONS, stringBuffer.toString(), Integer.toString(stringBuffer.length()));
-                                                       SymbolTableManager.insertInTable(entry);
-                                                     }*/
+                                                       SymbolEntry entry = new SymbolEntry("_" + stringBuffer.toString().replace(" ","_"), DataType.STRING_CONST, stringBuffer.toString(), Integer.toString(stringBuffer.length()));
+                                                       SymbolTableManager.insert(entry);
+                                                     }
 
                                                      return symbol(ParserSym.STRING_CONSTANT, yytext());
 

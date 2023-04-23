@@ -66,8 +66,10 @@ non terminal selection;
 non terminal read;
 non terminal write;
 
+non terminal program;
+
 // Start Symbol Definition
-start with sentence;
+start with program;
 
 
 /*
@@ -86,6 +88,8 @@ start with sentence;
 
 // INIT
 
+program ::= block;
+
 sentence ::= initRule {::};
 initRule ::= INIT OPEN_CURLY_BRACKET initBlock CLOSE_CURLY_BRACKET {::};
 initBlock ::= initBlock initSentence {::};
@@ -102,7 +106,7 @@ block ::= sentence {::};
 // CYCLE
 
 sentence ::= cycle {::};
-cycle ::= cycleCondition cycleBlock {::};
+cycle ::= CYCLE cycleCondition cycleBlock {::};
 cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET {::};
 cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
 
@@ -133,10 +137,6 @@ sentence ::= read {::};
 read ::= READ OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {::};
 sentence ::= write;
 write ::= WRITE OPEN_BRACKET factor CLOSE_BRACKET {: System.out.print("WRITE"); :};
-factor ::= IDENTIFIER:identifier;
-factor ::= INTEGER_CONSTANT:constant;
-factor ::= FLOAT_CONSTANT:constant;
-factor ::= expression;
 
 /* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};

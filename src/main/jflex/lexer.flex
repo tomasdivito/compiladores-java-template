@@ -74,7 +74,7 @@ ReservedWrite = "write"
 
 WhiteSpace = {LineTerminator} | {Identation}
 Identifier = {Letter} ({Letter}|{Digit})*
-IntegerConstant = {Digit}+
+IntegerConstant = {Sub}?{Digit}+
 FloatConstant = ({Digit}*{FloatPoint}{Digit}+)|({Digit}+{FloatPoint}{Digit}*)
 StringConstant = {DoubleQuote}{AnyCharExceptQuote}*{DoubleQuote}
 Comment = {OpenComment} [^"-"]* {CloseComment}

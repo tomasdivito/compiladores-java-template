@@ -65,20 +65,33 @@ start with sentence;
 
 */
 
+sentence ::= write {::};
+write ::= WRITE OPEN_BRACKET ID CLOSE_BRACKET {::};
+
+sentence ::= read {::};
+read ::= READ OPEN_BRACKET ID CLOSE_BRACKET {::};
+
 // INIT
 
-sentence ::= initRule;
-initRule ::= INIT OPEN;
+sentence ::= initRule {::};
+initRule ::= INIT OPEN_CURLY_BRACKET initBlock CLOSE_CURLY_BRACKET {::};
+initBlock ::= initBlock initSentence {::};
+initBlock ::= initSentence {::};
+initSentence ::= list COLON type {::};
+list ::= list COMA ID {::};
+type ::= INTEGER_CONSTANT {::};
+type ::= FLOAT_CONSTANT {::};
+type ::= STRING_CONSTANT {::};
 
-block ::= blockSentence {::};
+block ::= block sentence {::};
 block ::= sentence {::};
 
 // CYCLE
 
 sentence ::= cycle {::};
-cycle ::= cycleCondition cycleBlock;
-cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET;
-cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET;
+cycle ::= cycleCondition cycleBlock {::};
+cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET {::};
+cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
 
 // IF
 

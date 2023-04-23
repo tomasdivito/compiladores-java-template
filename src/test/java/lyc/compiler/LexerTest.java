@@ -22,7 +22,7 @@ public class LexerTest {
 
   private Lexer lexer;
 
-/*
+
   @Test
   public void comment() throws Exception{
     scan("This is a comment");
@@ -52,7 +52,8 @@ public class LexerTest {
       nextToken();
     });
   }
-*/
+
+
   @Test
   public void invalidNegativeIntegerConstantValue() {
     assertThrows(InvalidIntegerException.class, () -> {
@@ -60,7 +61,7 @@ public class LexerTest {
       nextToken();
     });
   }
-/*
+
   @Test
   public void assignmentWithExpressions() throws Exception {
     scan("c=d*(e-21)/4");
@@ -85,7 +86,7 @@ public class LexerTest {
       nextToken();
     });
   }
-*/
+
   @AfterEach
   public void resetLexer() {
     lexer = null;

@@ -50,6 +50,7 @@ LesserEq = "<="
 Equal = "=="
 Letter = [a-zA-Z]
 Digit = [0-9]
+NegativeSign = "-"
 FloatPoint = "."
 Coma = ","
 Cycle = "ciclo"
@@ -71,7 +72,7 @@ ReservedWrite = "write"
 
 WhiteSpace = {LineTerminator} | {Identation}
 Identifier = {Letter} ({Letter}|{Digit})*
-IntegerConstant = {Digit}+
+IntegerConstant = ({NegativeSign}{Digit}+)|({Digit}+)
 FloatConstant = ({Digit}*{FloatPoint}{Digit}+)|({Digit}+{FloatPoint}{Digit}*)
 StringConstant = {DoubleQuote}{AnyCharExceptQuote}*{DoubleQuote}
 Comment = {OpenComment} [^"-"]* {CloseComment}
@@ -105,8 +106,7 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
                                               return symbol(ParserSym.IDENTIFIER, yytext()); }
   /* Constants */
   {IntegerConstant}                        {
-                                                System.out.println(yytext());
-                                                if(Long.valueOf(yytext()) > MAX_INTEGER_LENGTH || Long.valueOf(yytext()) < MIN_INTEGER_LENGTH) {
+                                                if(Long.valueOf(yytext()) > MAX_INTEGER_LENGTH || (Long.valueOf(yytext()) < MIN_INTEGER_LENGTH)) {
                                                 throw new InvalidIntegerException("Integer out of bounds.");
                                              }
                                              return symbol(ParserSym.INTEGER_CONSTANT, yytext());

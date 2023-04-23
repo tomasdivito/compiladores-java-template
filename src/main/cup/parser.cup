@@ -50,6 +50,16 @@ non terminal factor;
 // Start Symbol Definition
 start with sentence;
 
+
+
+/* WRITE */
+sentence ::= WRITE OPEN_BRACKET content CLOSE_BRACKET {: System.out.print("WRITE"); :};
+content ::= ID;
+content ::= INTEGER_CONSTANT;
+content ::= FLOAT_CONSTANT;
+content ::= expression;
+
+/* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};
 assignment ::= IDENTIFIER ASSIG expression {: System.out.println("Assignment"); :};
 expression ::= expression PLUS term {: System.out.println("+"); :};
@@ -61,3 +71,5 @@ term ::= factor {: System.out.println("Term = factor"); :};
 factor ::= IDENTIFIER:id  {: System.out.println("Id: " + id); :};
 factor ::= INTEGER_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {: System.out.println("Factor = (Expression)"); :};
+
+/*  */

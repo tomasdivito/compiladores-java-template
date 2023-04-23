@@ -51,12 +51,62 @@ non terminal factor;
 start with sentence;
 
 
+/*
 
-/* WRITE */
+<SENTENCE> -> <INIT>
+<INIT> -> INIT OPEN_CURLY <INIT_BLOCK> CLOSE_CURLY
+<INIT_BLOCK> -> <INIT_BLOCK> <INIT_SENTENCE>
+<INIT_BLOCK> -> <INIT_SENTENCE>
+<INIT_SENTENCE> -> <LIST> COLON <TYPE>
+<LIST> -> <LIST> COMA ID
+<TYPE> -> INT
+<TYPE> -> FLOAT
+<TYPE> -> STRING
+
+*/
+
+// INIT
+
+sentence ::= initRule;
+initRule ::= INIT OPEN;
+
+block ::= blockSentence {::};
+block ::= sentence {::};
+
+// CYCLE
+
+sentence ::= cycle {::};
+cycle ::= cycleCondition cycleBlock;
+cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET;
+cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET;
+
+// IF
+
+sentence ::= selection {::};
+selection ::= trueBlock elseBlock {::};
+selection ::= trueBlock {::};
+trueBlock ::= conditional OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET;
+elseBlock ::= ELSE OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+conditional ::= IF OPEN_BRACKET condition CLOSE_BRACKET {::};
+condition ::= NOT conditionElement {::};
+condition ::= conditionElement optional conditionElement {::};
+condition ::= conditionElement {::};
+conditionElement ::= content operator content {::};
+
+// Logic Operators
+
+optional ::= AND {::};
+optional ::= OR {::};
+operator ::= EQUAL {::};
+operator ::= GREATER {::};
+operator ::= GREATER_EQ {::};
+operator ::= LESSER {::};
+operator ::= LESSER_EQ {::};
+
 sentence ::= WRITE OPEN_BRACKET content CLOSE_BRACKET {: System.out.print("WRITE"); :};
-content ::= ID;
-content ::= INTEGER_CONSTANT;
-content ::= FLOAT_CONSTANT;
+content ::= ID:id;
+content ::= INTEGER_CONSTANT:constant;
+content ::= FLOAT_CONSTANT:constant;
 content ::= expression;
 
 /* ARITMETIC EXPRESSION */
@@ -70,6 +120,7 @@ term ::= term DIV factor {: System.out.println("/"); :};
 term ::= factor {: System.out.println("Term = factor"); :};
 factor ::= IDENTIFIER:id  {: System.out.println("Id: " + id); :};
 factor ::= INTEGER_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
+factor ::= FLOAT_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {: System.out.println("Factor = (Expression)"); :};
 
 /*  */

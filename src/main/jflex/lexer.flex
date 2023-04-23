@@ -53,7 +53,6 @@ LesserEq = "<="
 Equal = "=="
 Letter = [a-zA-Z]
 Digit = [0-9]
-NegativeSign = "-"
 FloatPoint = "."
 Coma = ","
 Cycle = "ciclo"
@@ -75,7 +74,7 @@ ReservedWrite = "write"
 
 WhiteSpace = {LineTerminator} | {Identation}
 Identifier = {Letter} ({Letter}|{Digit})*
-IntegerConstant = ({NegativeSign}{Digit}+)|({Digit}+)
+IntegerConstant = {Digit}+
 FloatConstant = ({Digit}*{FloatPoint}{Digit}+)|({Digit}+{FloatPoint}{Digit}*)
 StringConstant = {DoubleQuote}{AnyCharExceptQuote}*{DoubleQuote}
 Comment = {OpenComment} [^"-"]* {CloseComment}

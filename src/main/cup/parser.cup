@@ -27,8 +27,8 @@ terminal FLOAT_CONSTANT;
 terminal IDENTIFIER;
 terminal COMA;
 terminal CYCLE; // palabra reservada "ciclo"
-terminal CONDITIONAL; // palabra reservada "if"
-terminal OPTION; //palabra reservada "else"
+terminal IF; // palabra reservada "if"
+terminal ELSE; //palabra reservada "else"
 terminal RESERVED_FLOAT; //palabra reservada "Float"
 terminal RESERVED_INT; //palabra reservada "Int"
 terminal RESERVED_STRING; //palabra reservada "String"
@@ -46,6 +46,25 @@ non terminal assignment;
 non terminal expression;
 non terminal term;
 non terminal factor;
+non terminal initRule;
+non terminal initBlock;
+non terminal cycle;
+non terminal list;
+non terminal type;
+non terminal initSentence;
+non terminal block;
+non terminal cycleCondition;
+non terminal cycleBlock;
+non terminal trueBlock;
+non terminal elseBlock;
+non terminal optional;
+non terminal operator;
+non terminal conditionElement;
+non terminal conditional;
+non terminal condition;
+non terminal selection;
+non terminal read;
+non terminal write;
 
 // Start Symbol Definition
 start with sentence;
@@ -65,12 +84,6 @@ start with sentence;
 
 */
 
-sentence ::= write {::};
-write ::= WRITE OPEN_BRACKET ID CLOSE_BRACKET {::};
-
-sentence ::= read {::};
-read ::= READ OPEN_BRACKET ID CLOSE_BRACKET {::};
-
 // INIT
 
 sentence ::= initRule {::};
@@ -78,7 +91,7 @@ initRule ::= INIT OPEN_CURLY_BRACKET initBlock CLOSE_CURLY_BRACKET {::};
 initBlock ::= initBlock initSentence {::};
 initBlock ::= initSentence {::};
 initSentence ::= list COLON type {::};
-list ::= list COMA ID {::};
+list ::= list COMA IDENTIFIER {::};
 type ::= INTEGER_CONSTANT {::};
 type ::= FLOAT_CONSTANT {::};
 type ::= STRING_CONSTANT {::};
@@ -104,7 +117,7 @@ conditional ::= IF OPEN_BRACKET condition CLOSE_BRACKET {::};
 condition ::= NOT conditionElement {::};
 condition ::= conditionElement optional conditionElement {::};
 condition ::= conditionElement {::};
-conditionElement ::= content operator content {::};
+conditionElement ::= factor operator factor {::};
 
 // Logic Operators
 
@@ -116,11 +129,14 @@ operator ::= GREATER_EQ {::};
 operator ::= LESSER {::};
 operator ::= LESSER_EQ {::};
 
-sentence ::= WRITE OPEN_BRACKET content CLOSE_BRACKET {: System.out.print("WRITE"); :};
-content ::= ID:id;
-content ::= INTEGER_CONSTANT:constant;
-content ::= FLOAT_CONSTANT:constant;
-content ::= expression;
+sentence ::= read {::};
+read ::= READ OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {::};
+sentence ::= write;
+write ::= WRITE OPEN_BRACKET factor CLOSE_BRACKET {: System.out.print("WRITE"); :};
+factor ::= IDENTIFIER:identifier;
+factor ::= INTEGER_CONSTANT:constant;
+factor ::= FLOAT_CONSTANT:constant;
+factor ::= expression;
 
 /* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};
@@ -131,7 +147,7 @@ expression ::= term {: System.out.println("Expression = Term"); :};
 term ::= term MULT factor {: System.out.println("*"); :};
 term ::= term DIV factor {: System.out.println("/"); :};
 term ::= factor {: System.out.println("Term = factor"); :};
-factor ::= IDENTIFIER:id  {: System.out.println("Id: " + id); :};
+factor ::= IDENTIFIER:identifier  {: System.out.println("Id: " + identifier); :};
 factor ::= INTEGER_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
 factor ::= FLOAT_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {: System.out.println("Factor = (Expression)"); :};

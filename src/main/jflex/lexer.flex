@@ -56,8 +56,8 @@ Digit = [0-9]
 FloatPoint = "."
 Coma = ","
 Cycle = "ciclo"
-Conditional = "if"
-Option = "else"
+If = "if"
+Else = "else"
 DoubleQuote = "\""
 OpenComment = "*-"
 CloseComment = "-*"
@@ -88,8 +88,8 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
 <YYINITIAL> {
 /* Reserved Words */
   {Cycle}                                   { return symbol(ParserSym.CYCLE); }
-  {Conditional}                             { return symbol(ParserSym.CONDITIONAL); }
-  {Option}                                  { return symbol(ParserSym.OPTION); }
+  {If}                             { return symbol(ParserSym.IF); }
+  {Else}                                  { return symbol(ParserSym.ELSE); }
   {ReservedFloat}                           { return symbol(ParserSym.RESERVED_FLOAT); }
   {ReserverdInt}                            { return symbol(ParserSym.RESERVED_INT); }
   {ReserverdString}                         { return symbol(ParserSym.RESERVED_STRING); }

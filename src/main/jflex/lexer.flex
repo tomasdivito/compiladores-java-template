@@ -26,6 +26,7 @@ import static lyc.compiler.constants.Constants.*;
   private Symbol symbol(int type, Object value) {
     return new Symbol(type, yyline, yycolumn, value);
   }
+  StringBuffer stringBuffer;
 %}
 
 
@@ -82,12 +83,54 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
 /* keywords */
 
 <YYINITIAL> {
+/* Reserved Words */
+  {Cycle}                                   { return symbol(ParserSym.CYCLE); }
+  {Conditional}                             { return symbol(ParserSym.CONDITIONAL); }
+  {Option}                                  { return symbol(ParserSym.OPTION); }
+  {ReservedFloat}                           { return symbol(ParserSym.RESERVED_FLOAT); }
+  {ReserverdInt}                            { return symbol(ParserSym.RESERVED_INT); }
+  {ReserverdString}                         { return symbol(ParserSym.RESERVED_STRING); }
+  {ReservedRead}                            { return symbol(ParserSym.READ); }
+  {ReservedAnd}                             { return symbol(ParserSym.AND); }
+  {ReservedOr}                              { return symbol(ParserSym.OR); }
+  {ReservedNot}                             { return symbol(ParserSym.NOT); }
+  {ReservedInit}                            { return symbol(ParserSym.INIT); }
+  {ReservedWrite}                           { return symbol(ParserSym.WRITE); }
   /* identifiers */
-  {Identifier}                             { return symbol(ParserSym.IDENTIFIER, yytext()); }
+  {Identifier}                             {
+                                              if(yytext().length() > MAX_LENGHT) {
+                                                throw new InvalidLengthException("Identifier out of bounds");
+                                              }
+
+                                              return symbol(ParserSym.IDENTIFIER, yytext()); }
   /* Constants */
-  {IntegerConstant}                        { return symbol(ParserSym.INTEGER_CONSTANT, yytext()); }
+  {IntegerConstant}                        {
+                                                System.out.println(yytext());
+                                                if(Long.valueOf(yytext()) > MAX_INTEGER_LENGTH || Long.valueOf(yytext()) < MIN_INTEGER_LENGTH) {
+                                                throw new InvalidIntegerException("Integer out of bounds.");
+                                             }
+                                             return symbol(ParserSym.INTEGER_CONSTANT, yytext());
+                                           }
+
   {FloatConstant}                          { return symbol(ParserSym.FLOAT_CONSTANT, yytext()); }
-  {StringConstant}                         { return symbol(ParserSym.STRING_CONSTANT, yytext()); }
+  {StringConstant}                         {
+                                                     stringBuffer = new StringBuffer(yytext());
+
+                                                     if (yytext().length() > MAX_STRING_LENGTH + 2)
+                                                       { throw new InvalidLengthException("String lenght out of bounds"); }
+
+                                                     stringBuffer.replace(0, 1, "");
+                                                     stringBuffer.replace(stringBuffer.length()-1,stringBuffer.length(), "");
+
+                                                     /*if(!SymbolTableManager.existsInTable(yytext()))
+                                                     {
+                                                       SymbolEntry entry = new SymbolEntry("_" + stringBuffer.toString().replace(" ","_"), DataType.STRING_CONS, stringBuffer.toString(), Integer.toString(stringBuffer.length()));
+                                                       SymbolTableManager.insertInTable(entry);
+                                                     }*/
+
+                                                     return symbol(ParserSym.STRING_CONSTANT, yytext());
+
+                                                 }
 
   /* operators */
   {Plus}                                    { return symbol(ParserSym.PLUS); }
@@ -108,26 +151,14 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
   {OpenCurlyBracket}                        { return symbol(ParserSym.OPEN_CURLY_BRACKET); }
   {CloseCurlyBracket}                       { return symbol(ParserSym.CLOSE_CURLY_BRACKET); }
 
-  /* Reserved Words */
-  {Cycle}                                   { return symbol(ParserSym.CYCLE); }
-  {Conditional}                             { return symbol(ParserSym.CONDITIONAL); }
-  {Option}                                  { return symbol(ParserSym.OPTION); }
-  {ReservedFloat}                           { return symbol(ParserSym.RESERVED_FLOAT); }
-  {ReserverdInt}                            { return symbol(ParserSym.RESERVED_INT); }
-  {ReserverdString}                         { return symbol(ParserSym.RESERVED_STRING); }
-  {ReservedRead}                            { return symbol(ParserSym.READ); }
-  {ReservedAnd}                             { return symbol(ParserSym.AND); }
-  {ReservedOr}                              { return symbol(ParserSym.OR); }
-  {ReservedNot}                             { return symbol(ParserSym.NOT); }
-  {ReservedInit}                            { return symbol(ParserSym.INIT); }
-  {ReservedWrite}                           { return symbol(ParserSym.WRITE); }
-
   /* Comments */
   {Comment}                                 { /* ignore */ }
 
-
   /* whitespace */
-  {WhiteSpace}                               { /* ignore */ }
+  {WhiteSpace}                              { /* ignore */ }
+
+  {LineTerminator}                          { /* ignore */ }
+  {Identation}                              { /* ignore */ }
 }
 
 

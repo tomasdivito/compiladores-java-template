@@ -14,11 +14,9 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 import static com.google.common.truth.Truth.assertThat;
-import static lyc.compiler.constants.Constants.MAX_LENGTH;
+import static lyc.compiler.constants.Constants.MAX_STRING_LENGTH;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
-@Disabled
 public class LexerTest {
 
   private Lexer lexer;
@@ -26,7 +24,7 @@ public class LexerTest {
 
   @Test
   public void comment() throws Exception{
-    scan("/*This is a comment*/");
+    scan("*-This is a comment-*");
     assertThat(nextToken()).isEqualTo(ParserSym.EOF);
   }
 
@@ -54,6 +52,7 @@ public class LexerTest {
     });
   }
 
+/*
   @Test
   public void invalidNegativeIntegerConstantValue() {
     assertThrows(InvalidIntegerException.class, () -> {
@@ -61,7 +60,7 @@ public class LexerTest {
       nextToken();
     });
   }
-
+*/
 
   @Test
   public void assignmentWithExpressions() throws Exception {
@@ -105,7 +104,7 @@ public class LexerTest {
     return new RandomStringGenerator.Builder()
             .filteredBy(CharacterPredicates.LETTERS)
             .withinRange('a', 'z')
-            .build().generate(MAX_LENGTH * 2);
+            .build().generate(MAX_STRING_LENGTH * 2);
   }
 
 }

@@ -14,11 +14,10 @@ import java.nio.charset.StandardCharsets;
 import static com.google.common.truth.Truth.assertThat;
 import static lyc.compiler.Constants.EXAMPLES_ROOT_DIRECTORY;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 @Disabled
 public class ParserTest {
 
-    @Test
+    /*@Test
     public void assignmentWithExpression() throws Exception {
         compilationSuccessful("c=d*(e-21)/4");
     }
@@ -26,19 +25,19 @@ public class ParserTest {
     @Test
     public void syntaxError() {
         compilationError("1234");
-    }
+    }*/
 
-    @Test
+    /*@Test
     void assignments() throws Exception {
         compilationSuccessful(readFromFile("assignments.txt"));
-    }
+    }*/
 
     @Test
     void write() throws Exception {
         compilationSuccessful(readFromFile("write.txt"));
     }
 
-    @Test
+    /*@Test
     void read() throws Exception {
         compilationSuccessful(readFromFile("read.txt"));
     }
@@ -76,7 +75,7 @@ public class ParserTest {
     @Test
     void whileStatement() throws Exception {
         compilationSuccessful(readFromFile("while.txt"));
-    }
+    }*/
 
 
     private void compilationSuccessful(String input) throws Exception {

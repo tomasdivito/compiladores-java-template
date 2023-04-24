@@ -81,7 +81,7 @@
         <os>
           <family>Windows</family>
         </os>
-          <activeByDefault>false</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <properties>
         <script.extension>bat</script.extension>
@@ -156,9 +156,9 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-            <finalName>lyc-compiler-${project.version}</finalName>
-            <appendAssemblyId>false</appendAssemblyId>
-          </configuration>
+          <finalName>lyc-compiler-${project.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+        </configuration>
         <executions>
           <execution>
             <id>make-assembly</id>

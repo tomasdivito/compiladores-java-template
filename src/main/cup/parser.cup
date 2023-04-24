@@ -7,14 +7,39 @@ class Parser;
 
 // Terminals
 terminal ASSIG;
+terminal COLON;
 terminal PLUS;
 terminal SUB;
 terminal MULT;
 terminal DIV;
+terminal GREATER;
+terminal LESSER;
+terminal GREATER_EQ;
+terminal LESSER_EQ;
+terminal EQUAL;
 terminal OPEN_BRACKET;
 terminal CLOSE_BRACKET;
+terminal OPEN_CURLY_BRACKET;
+terminal CLOSE_CURLY_BRACKET;
 terminal INTEGER_CONSTANT;
+terminal STRING_CONSTANT;
+terminal FLOAT_CONSTANT;
 terminal IDENTIFIER;
+terminal COMA;
+terminal CYCLE; // palabra reservada "ciclo"
+terminal IF; // palabra reservada "if"
+terminal ELSE; //palabra reservada "else"
+terminal RESERVED_FLOAT; //palabra reservada "Float"
+terminal RESERVED_INT; //palabra reservada "Int"
+terminal RESERVED_STRING; //palabra reservada "String"
+terminal RESERVED_CONCAT; //palabra reservada "ConcatenarConRecorte"
+terminal INIT;
+terminal WRITE;
+terminal READ;
+terminal AND;
+terminal OR;
+terminal NOT;
+
 
 // Non Terminals
 non terminal sentence;
@@ -22,18 +47,112 @@ non terminal assignment;
 non terminal expression;
 non terminal term;
 non terminal factor;
+non terminal initRule;
+non terminal initBlock;
+non terminal cycle;
+non terminal list;
+non terminal type;
+non terminal initSentence;
+non terminal block;
+non terminal cycleCondition;
+non terminal cycleBlock;
+non terminal trueBlock;
+non terminal elseBlock;
+non terminal optional;
+non terminal operator;
+non terminal conditionElement;
+non terminal conditional;
+non terminal condition;
+non terminal selection;
+non terminal read;
+non terminal write;
+non terminal concatParams;
+non terminal concatSentence;
+
+non terminal program;
 
 // Start Symbol Definition
-start with sentence;
+start with program;
 
+// INIT
+
+program ::= block;
+block ::= block sentence {::};
+block ::= sentence {::};
+
+// CONCATENAR CON RECORTE
+
+sentence ::= concatSentence {::};
+concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParams CLOSE_BRACKET {::};
+concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA INTEGER_CONSTANT {::};
+
+// IINIT
+
+sentence ::= initRule {::};
+initRule ::= INIT OPEN_CURLY_BRACKET initBlock CLOSE_CURLY_BRACKET {:System.out.println("INIT RULE");:};
+initBlock ::= initBlock initSentence {::};
+initBlock ::= initSentence {::};
+initSentence ::= list COLON type {::};
+list ::= list COMA IDENTIFIER {::};
+list ::= IDENTIFIER {::};
+type ::= RESERVED_INT {::};
+type ::= RESERVED_FLOAT {::};
+type ::= RESERVED_STRING {::};
+
+// CYCLE
+
+sentence ::= cycle {::};
+cycle ::= CYCLE cycleCondition cycleBlock {::};
+cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET {::};
+cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+
+// IF
+
+sentence ::= selection {::};
+selection ::= trueBlock elseBlock {::};
+selection ::= trueBlock {::};
+trueBlock ::= conditional OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET;
+elseBlock ::= ELSE OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+conditional ::= IF OPEN_BRACKET condition CLOSE_BRACKET {::};
+condition ::= NOT conditionElement {::};
+condition ::= conditionElement optional conditionElement {::};
+condition ::= conditionElement {::};
+conditionElement ::= factor operator factor {::};
+
+// Logic Operators
+
+optional ::= AND {::};
+optional ::= OR {::};
+operator ::= EQUAL {::};
+operator ::= GREATER {::};
+operator ::= GREATER_EQ {::};
+operator ::= LESSER {::};
+operator ::= LESSER_EQ {::};
+
+sentence ::= read {::};
+read ::= READ OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {::};
+read ::= READ OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {::};
+
+
+sentence ::= write;
+write ::= WRITE OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {: System.out.print("WRITE"); :};
+write ::= WRITE OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {: System.out.print("WRITE"); :};
+
+
+/* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};
 assignment ::= IDENTIFIER ASSIG expression {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER ASSIG STRING_CONSTANT {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER ASSIG concatSentence {: System.out.println("Assignment"); :};
 expression ::= expression PLUS term {: System.out.println("+"); :};
 expression ::= expression SUB term {: System.out.println("-"); :};
 expression ::= term {: System.out.println("Expression = Term"); :};
 term ::= term MULT factor {: System.out.println("*"); :};
 term ::= term DIV factor {: System.out.println("/"); :};
 term ::= factor {: System.out.println("Term = factor"); :};
-factor ::= IDENTIFIER:id  {: System.out.println("Id: " + id); :};
+factor ::= IDENTIFIER:identifier  {: System.out.println("Id: " + identifier); :};
 factor ::= INTEGER_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
+factor ::= FLOAT_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {: System.out.println("Factor = (Expression)"); :};
+
+/*  */

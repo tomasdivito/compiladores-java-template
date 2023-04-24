@@ -1,6 +1,6 @@
-a = 3.40
-b = .45
-c = 1.
-d = 340
+a = 1
 
-f = (a + b) / c
+write(a)
+write("1")
+read(a)
+read("str")

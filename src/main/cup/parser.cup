@@ -71,27 +71,16 @@ non terminal program;
 // Start Symbol Definition
 start with program;
 
-
-/*
-
-<SENTENCE> -> <INIT>
-<INIT> -> INIT OPEN_CURLY <INIT_BLOCK> CLOSE_CURLY
-<INIT_BLOCK> -> <INIT_BLOCK> <INIT_SENTENCE>
-<INIT_BLOCK> -> <INIT_SENTENCE>
-<INIT_SENTENCE> -> <LIST> COLON <TYPE>
-<LIST> -> <LIST> COMA ID
-<TYPE> -> INT
-<TYPE> -> FLOAT
-<TYPE> -> STRING
-
-*/
-
 // INIT
 
 program ::= block;
+block ::= block sentence {::};
+block ::= sentence {::};
+
+// IINIT
 
 sentence ::= initRule {::};
-initRule ::= INIT OPEN_CURLY_BRACKET initBlock CLOSE_CURLY_BRACKET {::};
+initRule ::= INIT OPEN_CURLY_BRACKET initBlock CLOSE_CURLY_BRACKET {:System.out.println("INIT RULE");:};
 initBlock ::= initBlock initSentence {::};
 initBlock ::= initSentence {::};
 initSentence ::= list COLON type {::};
@@ -99,9 +88,6 @@ list ::= list COMA IDENTIFIER {::};
 type ::= RESERVED_INT {::};
 type ::= RESERVED_FLOAT {::};
 type ::= RESERVED_STRING {::};
-
-block ::= block sentence {::};
-block ::= sentence {::};
 
 // CYCLE
 
@@ -135,8 +121,13 @@ operator ::= LESSER_EQ {::};
 
 sentence ::= read {::};
 read ::= READ OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {::};
+read ::= READ OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {::};
+
+
 sentence ::= write;
-write ::= WRITE OPEN_BRACKET factor CLOSE_BRACKET {: System.out.print("WRITE"); :};
+write ::= WRITE OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {: System.out.print("WRITE"); :};
+write ::= WRITE OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {: System.out.print("WRITE"); :};
+
 
 /* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};

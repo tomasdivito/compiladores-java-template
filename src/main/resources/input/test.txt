@@ -1,1 +1,1 @@
-a = “ewr” *- "asd" es una cte string -*
+a = "ewr"

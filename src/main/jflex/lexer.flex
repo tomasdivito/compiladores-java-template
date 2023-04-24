@@ -81,7 +81,7 @@ Identifier = {Letter} ({Letter}|{Digit})*
 IntegerConstant = {Digit}+
 FloatConstant = ({Digit}*{FloatPoint}{Digit}+)|({Digit}+{FloatPoint}{Digit}*)
 StringConstant = {DoubleQuote}{AnyCharExceptQuote}*{DoubleQuote}
-Comment = {OpenComment} [^"*"]* {CloseComment}
+Comment = {OpenComment} [^*] ~{CloseComment}
 SlashComment = {OpenSlash} [^"*"]* {CloseSlash}
 
 

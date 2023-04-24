@@ -1,1 +1,2 @@
-a = "ewr"
+write("ewr")  *- "ewr" es una cte string -*
+write(var1)  *- var1 es una variable numérica definida previamente -*

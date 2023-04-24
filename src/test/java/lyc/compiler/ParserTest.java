@@ -32,10 +32,10 @@ public class ParserTest {
         compilationSuccessful(readFromFile("assignments.txt"));
     }*/
 
-    /*@Test
+    @Test
     void write() throws Exception {
         compilationSuccessful(readFromFile("write.txt"));
-    }*/
+    }
 
     /*@Test
     void read() throws Exception {

@@ -32,6 +32,8 @@ import static lyc.compiler.constants.Constants.*;
   StringBuffer stringBuffer;
 %}
 
+%x OUTER_COMMENT INNER_COMMENT
+
 
 LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
@@ -61,11 +63,9 @@ And = "&"
 Cycle = "ciclo"
 If = "if"
 Else = "else"
-DoubleQuote = "\"" | "\“" | "\”"
+DoubleQuote = "\""
 OpenComment = "*-"
 CloseComment = "-*"
-OpenSlash = "/*"
-CloseSlash = "*/"
 AnyCharExceptQuote = [^"\""]
 ReservedFloat = "Float"
 ReserverdInt = "Int"
@@ -81,8 +81,7 @@ Identifier = {Letter} ({Letter}|{Digit})*
 IntegerConstant = {Digit}+
 FloatConstant = ({Digit}*{FloatPoint}{Digit}+)|({Digit}+{FloatPoint}{Digit}*)
 StringConstant = {DoubleQuote}{AnyCharExceptQuote}*{DoubleQuote}
-Comment = {OpenComment} [^*] ~{CloseComment}
-SlashComment = {OpenSlash} [^"*"]* {CloseSlash}
+Comment = {OpenComment} [^"*-"] ~{CloseComment}
 
 
 %%
@@ -176,14 +175,26 @@ SlashComment = {OpenSlash} [^"*"]* {CloseSlash}
   {CloseCurlyBracket}                       { return symbol(ParserSym.CLOSE_CURLY_BRACKET); }
 
   /* Comments */
-  {Comment}                                 { /* ignore */ }
-  {SlashComment}                            { /* ignore */ }
+  {OpenComment}                             { yybegin(OUTER_COMMENT); }
+  {CloseComment}                            { /* ignore */ }
 
   /* whitespace */
   {WhiteSpace}                              { /* ignore */ }
 
   {LineTerminator}                          { /* ignore */ }
   {Identation}                              { /* ignore */ }
+}
+
+<OUTER_COMMENT> {
+    {OpenComment}                           { yybegin(INNER_COMMENT); }
+    {CloseComment}                          { yybegin(YYINITIAL); }
+    [^"*"]                                  { /* ignore */ }
+}
+
+<INNER_COMMENT> {
+   {OpenComment}                            { throw new MultiLevelCommentException(" No more than one level of inner comments are allowed "); }
+   {CloseComment}                           { yybegin(OUTER_COMMENT); }
+   [^"*"]                                   { /* ignore */ }
 }
 
 

@@ -32,6 +32,7 @@ terminal ELSE; //palabra reservada "else"
 terminal RESERVED_FLOAT; //palabra reservada "Float"
 terminal RESERVED_INT; //palabra reservada "Int"
 terminal RESERVED_STRING; //palabra reservada "String"
+terminal RESERVED_CONCAT; //palabra reservada "ConcatenarConRecorte"
 terminal INIT;
 terminal WRITE;
 terminal READ;
@@ -65,6 +66,8 @@ non terminal condition;
 non terminal selection;
 non terminal read;
 non terminal write;
+non terminal concatParams;
+non terminal concatSentence;
 
 non terminal program;
 
@@ -76,6 +79,12 @@ start with program;
 program ::= block;
 block ::= block sentence {::};
 block ::= sentence {::};
+
+// CONCATENAR CON RECORTE
+
+sentence ::= concatSentence {::};
+concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParams CLOSE_BRACKET {::};
+concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA INTEGER_CONSTANT {::};
 
 // IINIT
 
@@ -133,6 +142,8 @@ write ::= WRITE OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {: System.out.print("
 /* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};
 assignment ::= IDENTIFIER ASSIG expression {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER ASSIG STRING_CONSTANT {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER ASSIG concatSentence {: System.out.println("Assignment"); :};
 expression ::= expression PLUS term {: System.out.println("+"); :};
 expression ::= expression SUB term {: System.out.println("-"); :};
 expression ::= term {: System.out.println("Expression = Term"); :};

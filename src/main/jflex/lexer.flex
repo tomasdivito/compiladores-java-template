@@ -61,9 +61,11 @@ And = "&"
 Cycle = "ciclo"
 If = "if"
 Else = "else"
-DoubleQuote = "\""
+DoubleQuote = "\"" | "\“" | "\”"
 OpenComment = "*-"
 CloseComment = "-*"
+OpenSlash = "/*"
+CloseSlash = "*/"
 AnyCharExceptQuote = [^"\""]
 ReservedFloat = "Float"
 ReserverdInt = "Int"
@@ -72,13 +74,15 @@ ReservedRead = "read"
 ReservedNot = "not"
 ReservedInit = "init"
 ReservedWrite = "write"
+ReservedConcat = "ConcatenarConRecorte"
 
 WhiteSpace = {LineTerminator} | {Identation}
 Identifier = {Letter} ({Letter}|{Digit})*
 IntegerConstant = {Digit}+
 FloatConstant = ({Digit}*{FloatPoint}{Digit}+)|({Digit}+{FloatPoint}{Digit}*)
 StringConstant = {DoubleQuote}{AnyCharExceptQuote}*{DoubleQuote}
-Comment = {OpenComment} [^"-"]* {CloseComment}
+Comment = {OpenComment} [^"*"]* {CloseComment}
+SlashComment = {OpenSlash} [^"*"]* {CloseSlash}
 
 
 %%
@@ -89,8 +93,8 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
 <YYINITIAL> {
 /* Reserved Words */
   {Cycle}                                   { return symbol(ParserSym.CYCLE); }
-  {If}                             { return symbol(ParserSym.IF); }
-  {Else}                                  { return symbol(ParserSym.ELSE); }
+  {If}                                      { return symbol(ParserSym.IF); }
+  {Else}                                    { return symbol(ParserSym.ELSE); }
   {ReservedFloat}                           { return symbol(ParserSym.RESERVED_FLOAT); }
   {ReserverdInt}                            { return symbol(ParserSym.RESERVED_INT); }
   {ReserverdString}                         { return symbol(ParserSym.RESERVED_STRING); }
@@ -98,6 +102,7 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
   {ReservedNot}                             { return symbol(ParserSym.NOT); }
   {ReservedInit}                            { return symbol(ParserSym.INIT); }
   {ReservedWrite}                           { return symbol(ParserSym.WRITE); }
+  {ReservedConcat}                          { return symbol(ParserSym.RESERVED_CONCAT); }
   /* identifiers */
   {Identifier}                             {
                                                   if(yytext().length() > MAX_LENGHT) {
@@ -172,6 +177,7 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
 
   /* Comments */
   {Comment}                                 { /* ignore */ }
+  {SlashComment}                            { /* ignore */ }
 
   /* whitespace */
   {WhiteSpace}                              { /* ignore */ }

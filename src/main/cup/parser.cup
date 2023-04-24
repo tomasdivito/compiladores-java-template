@@ -85,6 +85,7 @@ initBlock ::= initBlock initSentence {::};
 initBlock ::= initSentence {::};
 initSentence ::= list COLON type {::};
 list ::= list COMA IDENTIFIER {::};
+list ::= IDENTIFIER {::};
 type ::= RESERVED_INT {::};
 type ::= RESERVED_FLOAT {::};
 type ::= RESERVED_STRING {::};

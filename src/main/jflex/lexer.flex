@@ -55,6 +55,9 @@ Letter = [a-zA-Z]
 Digit = [0-9]
 FloatPoint = "."
 Coma = ","
+Colon = ":"
+Or = "||"
+And = "&"
 Cycle = "ciclo"
 If = "if"
 Else = "else"
@@ -66,8 +69,6 @@ ReservedFloat = "Float"
 ReserverdInt = "Int"
 ReserverdString = "String"
 ReservedRead = "read"
-ReservedAnd = "and"
-ReservedOr = "or"
 ReservedNot = "not"
 ReservedInit = "init"
 ReservedWrite = "write"
@@ -94,8 +95,6 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
   {ReserverdInt}                            { return symbol(ParserSym.RESERVED_INT); }
   {ReserverdString}                         { return symbol(ParserSym.RESERVED_STRING); }
   {ReservedRead}                            { return symbol(ParserSym.READ); }
-  {ReservedAnd}                             { return symbol(ParserSym.AND); }
-  {ReservedOr}                              { return symbol(ParserSym.OR); }
   {ReservedNot}                             { return symbol(ParserSym.NOT); }
   {ReservedInit}                            { return symbol(ParserSym.INIT); }
   {ReservedWrite}                           { return symbol(ParserSym.WRITE); }
@@ -161,6 +160,9 @@ Comment = {OpenComment} [^"-"]* {CloseComment}
   {LesserEq}                                { return symbol(ParserSym.LESSER_EQ); }
   {Equal}                                   { return symbol(ParserSym.EQUAL); }
   {Coma}                                    { return symbol(ParserSym.COMA); }
+  {Colon}                                   { return symbol(ParserSym.COLON); }
+  {Or}                                      { return symbol(ParserSym.OR); }
+  {And}                                     { return symbol(ParserSym.AND); }
 
   /* Brackets */
   {OpenBracket}                             { return symbol(ParserSym.OPEN_BRACKET); }

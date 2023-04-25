@@ -58,3 +58,10 @@ else
 
 read(p2)
 p3 = p2
+
+*- a = "pruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebaprueba" -*
+*- b = 9999999 -*
+*- a -*
+*- 123 -*
+*- if(a == 1 & b == 2 & c ==3) { a = 1 }-*
+*- for (a >= b || b == 2 & c == 3) { a = a + 1 } -*

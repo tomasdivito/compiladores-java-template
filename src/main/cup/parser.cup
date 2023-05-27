@@ -1,9 +1,44 @@
 package lyc.compiler;
 
 import java_cup.runtime.*;
+import java.util.HashMap;
+import SymbolTableGenerator.DataType;
+import SymbolTableGenerator.SymbolEntry;
+import SymbolTableGenerator.SymbolTableManager;
 
 class Parser;
 
+action code {:
+    private boolean debug = false;
+    private int SentenceIndex = 0;
+    private int AssignmentIndex = 0;
+    private int ExpressionIndex = 0;
+    private int TermIndex = 0;
+    private int FactorIndex = 0;
+    private int InitRuleIndex = 0;
+    private int InitBlockIndex = 0;
+    private int CycleIndex = 0;
+    private int ListIndex = 0;
+    private int TypeIndex = 0;
+    private int InitSentenceIndex = 0;
+    private int BlockIndex = 0;
+    private int CycleConditionIndex = 0;
+    private int CycleBlockIndex = 0;
+    private int TrueBlockIndex = 0;
+    private int ElseBlockIndex = 0;
+    private int OptionalIndex = 0;
+    private int OperatorIndex = 0;
+    private int ConditionElementIndex = 0;
+    private int ConditionalIndex = 0;
+    private int ConditionIndex = 0;
+    private int SelectionIndex = 0;
+    private int ReadIndex = 0;
+    private int WriteIndex = 0;
+    private int ConcatParamsIndex = 0;
+    private int ConcatSentenceIndex = 0;
+
+    private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
+:};
 
 // Terminals
 terminal ASSIG;
@@ -83,7 +118,9 @@ block ::= sentence {::};
 // CONCATENAR CON RECORTE
 
 sentence ::= concatSentence {::};
-concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParams CLOSE_BRACKET {::};
+concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParams CLOSE_BRACKET {:
+    System.out.println("concat sentence");
+:};
 concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA INTEGER_CONSTANT {::};
 
 // IINIT
@@ -143,7 +180,7 @@ write ::= WRITE OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {: System.out.print("
 sentence ::= assignment {: System.out.println("End"); :};
 assignment ::= IDENTIFIER ASSIG expression {: System.out.println("Assignment"); :};
 assignment ::= IDENTIFIER ASSIG STRING_CONSTANT {: System.out.println("Assignment"); :};
-assignment ::= IDENTIFIER ASSIG concatSentence {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER ASSIG concatSentence {: System.out.println("Assignment de concatenar cadena"); :};
 expression ::= expression PLUS term {: System.out.println("+"); :};
 expression ::= expression SUB term {: System.out.println("-"); :};
 expression ::= term {: System.out.println("Expression = Term"); :};

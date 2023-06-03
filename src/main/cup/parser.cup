@@ -2,14 +2,17 @@ package lyc.compiler;
 
 import java_cup.runtime.*;
 import java.util.HashMap;
+import java.util.ArrayList;
 import SymbolTableGenerator.DataType;
 import SymbolTableGenerator.SymbolEntry;
 import SymbolTableGenerator.SymbolTableManager;
+import Tercetos.Terceto;
+import Tercetos.TercetoGenerator;
 
 class Parser;
 
 action code {:
-    private boolean debug = false;
+    private boolean debug = true;
     private int SentenceIndex = 0;
     private int AssignmentIndex = 0;
     private int ExpressionIndex = 0;
@@ -38,8 +41,11 @@ action code {:
     private int ConcatSentenceIndex = 0;
     private int NonTerminalIndex = 0;
 
-    private TercetoGenerator tercetoGenerator = new TercetoGenerator();
+    private ArrayList<Terceto> tercetos = TercetoGenerator.tercetos;
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
+
+    private DataType VariableType;
+    private ArrayList<String> VariableList = new ArrayList<String>();
 :};
 
 // Terminals
@@ -131,12 +137,29 @@ sentence ::= initRule {::};
 initRule ::= INIT OPEN_CURLY_BRACKET initBlock CLOSE_CURLY_BRACKET {:System.out.println("INIT RULE");:};
 initBlock ::= initBlock initSentence {::};
 initBlock ::= initSentence {::};
-initSentence ::= list COLON type {::};
-list ::= list COMA IDENTIFIER {::};
-list ::= IDENTIFIER {::};
-type ::= RESERVED_INT {::};
-type ::= RESERVED_FLOAT {::};
-type ::= RESERVED_STRING {::};
+initSentence ::= list COLON type {:
+    if (debug) {
+        System.out.println("Declaracion de variables");
+    }
+
+    VariableList.forEach((var) -> SymbolTableManager.setDataType(var, VariableType));
+    VariableList.clear();
+:};
+list ::= list COMA IDENTIFIER:id {:
+    VariableList.add(id.toString());
+:};
+list ::= IDENTIFIER:id {:
+    VariableList.add(id.toString());
+:};
+type ::= RESERVED_INT:id {:
+    VariableType = DataType.INTEGER_TYPE;
+:};
+type ::= RESERVED_FLOAT:id {:
+    VariableType = DataType.FLOAT_TYPE;
+:};
+type ::= RESERVED_STRING {:
+    VariableType = DataType.STRING_TYPE;
+:};
 
 // CYCLE
 
@@ -190,21 +213,24 @@ term ::= term MULT factor {: System.out.println("*"); :};
 term ::= term DIV factor {: System.out.println("/"); :};
 term ::= factor {: System.out.println("Term = factor"); :};
 factor ::= IDENTIFIER:identifier  {:
-                                    if(debug){ System.out.println("Id: " + identifier); }
-                                    else {
-                                        FactorIndex = tercetoGenerator.add(identifier);
+                                    if (debug) {
+                                        System.out.println("Id: " + identifier);
                                     }
+                                    FactorIndex = TercetoGenerator.crearTerceto(identifier);
                                 :};
 factor ::= INTEGER_CONSTANT:constant {:
-                                        if(debug) { System.out.println("Constant: " + constant ); }
-                                        else {
-                                            FactorIndex = tercetoGenerator.add(constant);
+                                        if (debug) {
+                                            System.out.println("Constant: " + constant );
                                         }
+
+                                        FactorIndex = TercetoGenerator.crearTerceto(constant);
                                 :};
 factor ::= FLOAT_CONSTANT:constant {:
-                                        if(debug) { System.out.println("Constant: " + constant ); }
+                                        if (debug) {
+                                            System.out.println("Constant: " + constant );
+                                        }
                                         else {
-                                            FactorIndex = tercetoGenerator.add(constant);
+                                            FactorIndex = TercetoGenerator.crearTerceto(constant);
                                         }
                                 :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {: System.out.println("Factor = (Expression)"); :};

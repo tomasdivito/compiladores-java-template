@@ -48,6 +48,10 @@ action code {:
     private ArrayList<String> VariableList = new ArrayList<String>();
     private DataType FactorType = null;
     private DataType TermType = null;
+
+    private String ConcatFirstString = null;
+    private String ConcatSecondString = null;
+    private Integer ConcatIndex = null;
 :};
 
 // Terminals
@@ -126,12 +130,35 @@ block ::= block sentence {::};
 block ::= sentence {::};
 
 // CONCATENAR CON RECORTE
+/**
 
+    private String ConcatFirstString = null;
+    private String ConcatSecondString = null;
+    private Integer ConcatIndex = null;
+    **/
 sentence ::= concatSentence {::};
 concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParams CLOSE_BRACKET {:
     System.out.println("concat sentence");
 :};
-concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA INTEGER_CONSTANT {::};
+concatParams ::= IDENTIFIER COMA IDENTIFIER COMA concatIndexParam {::};
+concatParams ::= IDENTIFIER COMA STRING_CONSTANT COMA concatIndexParam {::};
+concatParams ::= STRING_CONSTANT COMA IDENTIFIER COMA concatIndexParam {::};
+concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA concatIndexParam {::};
+concatIndexParam ::= IDENTIFIER:id {:
+    if (debug) {
+        System.out.println("Got concat index param identifier:", id.toString());
+    }
+
+    if (SymbolTableManager.getType(id.toString()) != DataType.INTEGER_TYPE) {
+        System.out.println("Error, se esperaba un entero como indice para recorte");
+        System.exit(1);
+    }
+
+
+:};
+concatIndexParam ::= INTEGER_CONSTANT:cte {:
+
+:};
 
 // IINIT
 

@@ -3,17 +3,11 @@ package Tercetos;
 import java.util.ArrayList;
 
 public class TercetoGenerator {
+    public static ArrayList<Terceto> tercetos = new ArrayList<Terceto>();
 
-    // Tenemos que tener un indice por terminal
+    public void crearTerceto(
 
-    // Cuando creas el terceto se guarda el operador.
-    private ArrayList<Terceto> tercetos;
-
-    public TercetoGenerator() {
-        tercetos = new ArrayList<Terceto>();
-    }
-
-    public void crearTerceto() {
+    ) {
 
     }
 }

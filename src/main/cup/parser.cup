@@ -36,6 +36,7 @@ action code {:
     private int WriteIndex = 0;
     private int ConcatParamsIndex = 0;
     private int ConcatSentenceIndex = 0;
+    private int NonTerminalIndex = 0;
 
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
 :};

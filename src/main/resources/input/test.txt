@@ -8,6 +8,7 @@ a = 3.40
 b = .45
 c = 1.
 cadenaResultante = ConcatenarConRecorte("Hola", "Mundo", 2)
+p2 = "pepepepepepepepepepe"
 d = 340
 
 f = (a + b) / c

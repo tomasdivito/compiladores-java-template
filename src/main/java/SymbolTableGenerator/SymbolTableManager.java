@@ -18,7 +18,22 @@ public class SymbolTableManager {
         entry.setDataType(type);
     }
 
+    public static void setValue(String key, String value) {
+        SymbolEntry entry = symbolTable.get(key);
+        entry.setValue(value);
+    }
+
+    public static void setLength(String key, String length) {
+        SymbolEntry entry = symbolTable.get(key);
+        entry.setLength(length);
+    }
+
     public static boolean exists(String entryName) {
         return symbolTable.containsKey(entryName);
+    }
+
+    public static DataType getType(String key) {
+        SymbolEntry entry = symbolTable.get(key);
+        return entry.getDataType();
     }
 }

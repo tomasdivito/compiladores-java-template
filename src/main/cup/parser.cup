@@ -7,7 +7,7 @@ import SymbolTableGenerator.DataType;
 import SymbolTableGenerator.SymbolEntry;
 import SymbolTableGenerator.SymbolTableManager;
 import Tercetos.Terceto;
-import Tercetos.TercetoGenerator;
+import Tercetos.TercetoManager;
 
 class Parser;
 
@@ -41,11 +41,13 @@ action code {:
     private int ConcatSentenceIndex = 0;
     private int NonTerminalIndex = 0;
 
-    private ArrayList<Terceto> tercetos = TercetoGenerator.tercetos;
+    private ArrayList<Terceto> tercetos = TercetoManager.tercetos;
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
 
-    private DataType VariableType;
+    private DataType VariableType = null;
     private ArrayList<String> VariableList = new ArrayList<String>();
+    private DataType FactorType = null;
+    private DataType TermType = null;
 :};
 
 // Terminals
@@ -204,33 +206,89 @@ write ::= WRITE OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {: System.out.print("
 /* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};
 assignment ::= IDENTIFIER ASSIG expression {: System.out.println("Assignment"); :};
-assignment ::= IDENTIFIER ASSIG STRING_CONSTANT {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER:id ASSIG STRING_CONSTANT:str {:
+    if (debug) {
+        System.out.println("Assignment");
+    }
+
+    AssignmentIndex = TercetoManager.crearTerceto("=", id.toString(), str.toString());
+
+    DataType type = SymbolTableManager.getType(id.toString());
+    if (type != DataType.STRING_TYPE) {
+        System.out.println("Error: Asignacion de variable " + id.toString());
+        System.exit(1);
+    }
+
+    SymbolTableManager.setValue(id.toString(), str.toString());
+    SymbolTableManager.setLength(id.toString(), Integer.toString(str.toString().length()));
+
+:};
 assignment ::= IDENTIFIER ASSIG concatSentence {: System.out.println("Assignment de concatenar cadena"); :};
-expression ::= expression PLUS term {: System.out.println("+"); :};
-expression ::= expression SUB term {: System.out.println("-"); :};
-expression ::= term {: System.out.println("Expression = Term"); :};
-term ::= term MULT factor {: System.out.println("*"); :};
-term ::= term DIV factor {: System.out.println("/"); :};
-term ::= factor {: System.out.println("Term = factor"); :};
+expression ::= expression PLUS term {:
+    if (debug) {
+        System.out.println("+");
+    }
+
+    ExpressionIndex = TercetoManager.crearTerceto("+", "[" + ExpressionIndex + "]", "[" + TermIndex + "]");
+:};
+expression ::= expression SUB term {:
+    if (debug) {
+        System.out.println("-");
+    }
+
+    ExpressionIndex = TercetoManager.crearTerceto("-", "[" + ExpressionIndex + "]", "[" + TermIndex + "]");
+:};
+expression ::= term {:
+     if (debug) {
+        System.out.println("Expression = Term");
+     }
+
+     ExpressionIndex = TermIndex;
+:};
+term ::= term MULT factor {:
+    if (debug) {
+        System.out.println("*");
+    }
+
+    TermIndex = TercetoManager.crearTerceto("*", "[" + TermIndex + "]", "[" + FactorIndex + "]");
+:};
+term ::= term DIV factor {:
+    if (debug) {
+        System.out.println("/");
+    }
+
+    TermIndex = TercetoManager.crearTerceto("/", "[" + TermIndex + "]", "[" + FactorIndex + "]");
+:};
+term ::= factor {:
+    if (debug) {
+        System.out.println("Term = factor");
+    }
+
+    TermIndex = FactorIndex;
+    TermType = FactorType;
+:};
 factor ::= IDENTIFIER:identifier  {:
                                     if (debug) {
                                         System.out.println("Id: " + identifier);
                                     }
-                                    FactorIndex = TercetoGenerator.crearTerceto(identifier);
+                                    FactorIndex = TercetoManager.crearTerceto(identifier.toString());
+                                    FactorType = SymbolTableManager.getType(identifier.toString());
                                 :};
 factor ::= INTEGER_CONSTANT:constant {:
                                         if (debug) {
                                             System.out.println("Constant: " + constant );
                                         }
 
-                                        FactorIndex = TercetoGenerator.crearTerceto(constant);
+                                        FactorIndex = TercetoManager.crearTerceto(constant.toString());
+                                        FactorType = DataType.INTEGER_TYPE;
                                 :};
 factor ::= FLOAT_CONSTANT:constant {:
                                         if (debug) {
                                             System.out.println("Constant: " + constant );
                                         }
                                         else {
-                                            FactorIndex = TercetoGenerator.crearTerceto(constant);
+                                            FactorIndex = TercetoManager.crearTerceto(constant.toString());
+                                            FactorType = DataType.FLOAT_TYPE;
                                         }
                                 :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {: System.out.println("Factor = (Expression)"); :};

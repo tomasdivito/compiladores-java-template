@@ -1,19 +1,19 @@
 package lyc.compiler.files;
 
 import Tercetos.Terceto;
-import Tercetos.TercetoGenerator;
+import Tercetos.TercetoManager;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static Tercetos.TercetoGenerator.tercetos;
+import static Tercetos.TercetoManager.tercetos;
 
 public class IntermediateCodeGenerator implements FileGenerator {
     @Override
     public void generate(FileWriter fileWriter) throws IOException {
         // los tercetos
-        ArrayList<Terceto> tercetos = TercetoGenerator.tercetos;
+        ArrayList<Terceto> tercetos = TercetoManager.tercetos;
 
         // todo: necesitamos que se escriban los tercetos en un archivo
         // puede ser como cada linea sea:

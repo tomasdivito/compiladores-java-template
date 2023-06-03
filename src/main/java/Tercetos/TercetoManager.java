@@ -2,7 +2,7 @@ package Tercetos;
 
 import java.util.ArrayList;
 
-public class TercetoGenerator {
+public class TercetoManager {
     public static ArrayList<Terceto> tercetos = new ArrayList<Terceto>();
 
     public static Integer crearTerceto(String operador, String primer_operando, String segundo_operando) {

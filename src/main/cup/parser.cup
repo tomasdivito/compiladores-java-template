@@ -38,6 +38,7 @@ action code {:
     private int ConcatSentenceIndex = 0;
     private int NonTerminalIndex = 0;
 
+    private TercetoGenerator tercetoGenerator = new TercetoGenerator();
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
 :};
 
@@ -188,9 +189,24 @@ expression ::= term {: System.out.println("Expression = Term"); :};
 term ::= term MULT factor {: System.out.println("*"); :};
 term ::= term DIV factor {: System.out.println("/"); :};
 term ::= factor {: System.out.println("Term = factor"); :};
-factor ::= IDENTIFIER:identifier  {: System.out.println("Id: " + identifier); :};
-factor ::= INTEGER_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
-factor ::= FLOAT_CONSTANT:constant {: System.out.println("Constant: " + constant ); :};
+factor ::= IDENTIFIER:identifier  {:
+                                    if(debug){ System.out.println("Id: " + identifier); }
+                                    else {
+                                        FactorIndex = tercetoGenerator.add(identifier);
+                                    }
+                                :};
+factor ::= INTEGER_CONSTANT:constant {:
+                                        if(debug) { System.out.println("Constant: " + constant ); }
+                                        else {
+                                            FactorIndex = tercetoGenerator.add(constant);
+                                        }
+                                :};
+factor ::= FLOAT_CONSTANT:constant {:
+                                        if(debug) { System.out.println("Constant: " + constant ); }
+                                        else {
+                                            FactorIndex = tercetoGenerator.add(constant);
+                                        }
+                                :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {: System.out.println("Factor = (Expression)"); :};
 
 /*  */

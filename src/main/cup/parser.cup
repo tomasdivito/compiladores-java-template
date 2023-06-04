@@ -54,11 +54,14 @@ action code {:
 
     private ArrayList<Terceto> tercetos = TercetoManager.tercetos;
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
-
-    private DataType VariableType = null;
     private ArrayList<String> VariableList = new ArrayList<String>();
+
+    private DataType leftSideType = null;
+    private DataType rightSideType = null;
+    private DataType VariableType = null;
     private DataType FactorType = null;
     private DataType TermType = null;
+    private DataType ExpressionType = null;
 
     private String ConcatFirstString = null;
     private String ConcatSecondString = null;
@@ -166,8 +169,6 @@ concatIndexParam ::= IDENTIFIER:id {:
         System.out.println("Error, se esperaba un entero como indice para recorte");
         System.exit(1);
     }
-
-
 :};
 concatIndexParam ::= INTEGER_CONSTANT:cte {:
 
@@ -184,8 +185,10 @@ initSentence ::= list COLON type {:
         System.out.println("Declaracion de variables");
     }
 
-    VariableList.forEach((var) -> SymbolTableManager.setDataType(var, VariableType));
-    VariableList.clear();
+    for(String variable : VariableList) {
+        SymbolTableManager.setDataType(variable, VariableType);
+    }
+    VariableList = new ArrayList<String>();
 :};
 list ::= list COMA IDENTIFIER:id {:
     VariableList.add(id.toString());
@@ -226,7 +229,7 @@ selection ::= IF OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block C
         Integer tercetosSize = TercetoManager.getTercetosSize();
         elseBlockIndex = tercetosSize;
         branchIndex = stack.pop();
-        TercetoManager.modificarSalto(branchIndex, "[" + nextBlockIndex + "]");
+        TercetoManager.modificarSalto(branchIndex, "[" + elseBlockIndex + "]");
 
         stack.push(inconditionalBranchIndex);
     :}
@@ -257,8 +260,13 @@ condition ::= conditionElement logicalConcat {:
                 }
             :};
 condition ::= conditionElement {: stack.push(branchIndex); :};
-conditionElement ::= expression {: leftSideExpressionIndex = ExpressionIndex; :}
+conditionElement ::= expression {: leftSideExpressionIndex = ExpressionIndex; leftSideType = ExpressionType;:}
     logicalOperator expression {:
+        rightSideType = ExpressionType;
+        if(leftSideType != rightSideType) {
+            System.out.println("Cannot compare " + leftSideType.getName() + " to " + rightSideType.getName());
+            System.exit(1);
+        }
         conditionElementIndex = TercetoManager.crearTerceto("CMP", "[" + leftSideExpressionIndex + "]", "[" + ExpressionIndex + "]");
         branchIndex = TercetoManager.crearTerceto(branchOppositeOperator, "_");
     :};
@@ -286,7 +294,19 @@ write ::= WRITE OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {: System.out.print("
 
 /* ARITMETIC EXPRESSION */
 sentence ::= assignment {: System.out.println("End"); :};
-assignment ::= IDENTIFIER ASSIG expression {: System.out.println("Assignment"); :};
+assignment ::= IDENTIFIER:id ASSIG expression {:
+    if(debug) {
+        System.out.println("Assignment");
+    }
+
+    DataType idType = SymbolTableManager.getType(id.toString());
+    if(idType != ExpressionType) {
+        System.out.println("Cannot assign " + ExpressionType.getName() + " to " + idType.getName());
+        System.exit(1);
+    }
+
+    AssignmentIndex = TercetoManager.crearTerceto("=", id.toString(), "[" + ExpressionIndex + "]");
+:};
 assignment ::= IDENTIFIER:id ASSIG STRING_CONSTANT:str {:
     if (debug) {
         System.out.println("Assignment");
@@ -310,11 +330,19 @@ expression ::= expression PLUS term {:
         System.out.println("+");
     }
 
+    if(ExpressionType == DataType.FLOAT_TYPE || TermType == DataType.FLOAT_TYPE) {
+        ExpressionType = DataType.FLOAT_TYPE;
+    }
+
     ExpressionIndex = TercetoManager.crearTerceto("+", "[" + ExpressionIndex + "]", "[" + TermIndex + "]");
 :};
 expression ::= expression SUB term {:
     if (debug) {
         System.out.println("-");
+    }
+
+    if(ExpressionType == DataType.FLOAT_TYPE || TermType == DataType.FLOAT_TYPE) {
+        ExpressionType = DataType.FLOAT_TYPE;
     }
 
     ExpressionIndex = TercetoManager.crearTerceto("-", "[" + ExpressionIndex + "]", "[" + TermIndex + "]");
@@ -324,6 +352,7 @@ expression ::= term {:
         System.out.println("Expression = Term");
      }
 
+     ExpressionType = TermType;
      ExpressionIndex = TermIndex;
 :};
 term ::= term MULT factor {:
@@ -331,11 +360,19 @@ term ::= term MULT factor {:
         System.out.println("*");
     }
 
+    if(TermType == DataType.FLOAT_TYPE || FactorType == DataType.FLOAT_TYPE) {
+        TermType = DataType.FLOAT_TYPE;
+    }
+
     TermIndex = TercetoManager.crearTerceto("*", "[" + TermIndex + "]", "[" + FactorIndex + "]");
 :};
 term ::= term DIV factor {:
     if (debug) {
         System.out.println("/");
+    }
+
+    if(TermType == DataType.FLOAT_TYPE || FactorType == DataType.FLOAT_TYPE) {
+        TermType = DataType.FLOAT_TYPE;
     }
 
     TermIndex = TercetoManager.crearTerceto("/", "[" + TermIndex + "]", "[" + FactorIndex + "]");

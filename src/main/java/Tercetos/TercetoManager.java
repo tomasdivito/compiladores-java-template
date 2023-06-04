@@ -48,7 +48,7 @@ public class TercetoManager {
 
     public static ArrayList<String> getTercetoString() {
         ArrayList<String> result = new ArrayList<>();
-        Integer index = 1;
+        Integer index = 0;
         for(Terceto terceto : tercetos) {
             result.add("[" + index.toString() + "] " + terceto.toString());
             index++;

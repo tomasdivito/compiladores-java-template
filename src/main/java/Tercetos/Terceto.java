@@ -19,6 +19,8 @@ public class Terceto {
 
     public Terceto(String operador) {
         this.operador = operador;
+        this.primer_operando = "_";
+        this.segundo_operando = "_";
     }
 
     public void setOperador(String operador) {

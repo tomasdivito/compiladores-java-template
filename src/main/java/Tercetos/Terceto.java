@@ -5,14 +5,20 @@ public class Terceto {
     private String primer_operando;
     private String segundo_operando;
 
-    public Terceto(String operador) {
-        this.operador = operador;
-    }
-
     public Terceto(String operador, String primer_operando, String segundo_operando) {
         this.operador = operador;
         this.primer_operando = primer_operando;
         this.segundo_operando = segundo_operando;
+    }
+
+    public Terceto(String operador, String operando) {
+        this.operador = operador;
+        this.primer_operando = operando;
+        this.segundo_operando = "_";
+    }
+
+    public Terceto(String operador) {
+        this.operador = operador;
     }
 
     public void setOperador(String operador) {
@@ -37,5 +43,12 @@ public class Terceto {
 
     public String getSegundoOperando() {
         return this.segundo_operando;
+    }
+
+    @Override
+    public String toString() {
+        String tercetoStr = "";
+        tercetoStr = "(" + this.operador + ", " + this.primer_operando + ", " + this.segundo_operando + ")";
+        return tercetoStr;
     }
 }

@@ -3,6 +3,7 @@ package lyc.compiler;
 import java_cup.runtime.*;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Stack;
 import SymbolTableGenerator.DataType;
 import SymbolTableGenerator.SymbolEntry;
 import SymbolTableGenerator.SymbolTableManager;
@@ -25,21 +26,31 @@ action code {:
     private int TypeIndex = 0;
     private int InitSentenceIndex = 0;
     private int BlockIndex = 0;
+    private int thenBlockIndex = 0;
+    private int elseBlockIndex = 0;
+    private int nextBlockIndex = 0;
     private int CycleConditionIndex = 0;
     private int CycleBlockIndex = 0;
     private int TrueBlockIndex = 0;
     private int ElseBlockIndex = 0;
     private int OptionalIndex = 0;
     private int OperatorIndex = 0;
-    private int ConditionElementIndex = 0;
-    private int ConditionalIndex = 0;
-    private int ConditionIndex = 0;
+    private int conditionElementIndex = 0;
+    private int conditionIndex = 0;
     private int SelectionIndex = 0;
     private int ReadIndex = 0;
     private int WriteIndex = 0;
     private int ConcatParamsIndex = 0;
     private int ConcatSentenceIndex = 0;
     private int NonTerminalIndex = 0;
+    private int leftSideExpressionIndex = 0;
+    private int branchIndex = 0;
+    private int rightBranchIndex = 0;
+    private int leftBranchIndex = 0;
+
+    private String branchOperator = null;
+    private String branchOppositeOperator = null;
+    private String concatOperator = null;
 
     private ArrayList<Terceto> tercetos = TercetoManager.tercetos;
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
@@ -52,6 +63,8 @@ action code {:
     private String ConcatFirstString = null;
     private String ConcatSecondString = null;
     private Integer ConcatIndex = null;
+
+    private Stack<Integer> stack = new Stack<Integer>();
 :};
 
 // Terminals
@@ -107,16 +120,16 @@ non terminal cycleCondition;
 non terminal cycleBlock;
 non terminal trueBlock;
 non terminal elseBlock;
-non terminal optional;
-non terminal operator;
+non terminal logicalConcat;
+non terminal logicalOperator;
 non terminal conditionElement;
-non terminal conditional;
 non terminal condition;
 non terminal selection;
 non terminal read;
 non terminal write;
 non terminal concatParams;
 non terminal concatSentence;
+non terminal concatIndexParam;
 
 non terminal program;
 
@@ -146,7 +159,7 @@ concatParams ::= STRING_CONSTANT COMA IDENTIFIER COMA concatIndexParam {::};
 concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA concatIndexParam {::};
 concatIndexParam ::= IDENTIFIER:id {:
     if (debug) {
-        System.out.println("Got concat index param identifier:", id.toString());
+        System.out.println("Got concat index param identifier:" + id.toString());
     }
 
     if (SymbolTableManager.getType(id.toString()) != DataType.INTEGER_TYPE) {
@@ -193,32 +206,73 @@ type ::= RESERVED_STRING {:
 // CYCLE
 
 sentence ::= cycle {::};
-cycle ::= CYCLE cycleCondition cycleBlock {::};
-cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET {::};
-cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+cycle ::= CYCLE OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+//cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET {::};
+//cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
 
 // IF
 
 sentence ::= selection {::};
-selection ::= trueBlock elseBlock {::};
-selection ::= trueBlock {::};
-trueBlock ::= conditional OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET;
-elseBlock ::= ELSE OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
-conditional ::= IF OPEN_BRACKET condition CLOSE_BRACKET {::};
-condition ::= NOT conditionElement {::};
-condition ::= conditionElement optional conditionElement {::};
-condition ::= conditionElement {::};
-conditionElement ::= factor operator factor {::};
+selection ::= IF OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {:
+        Integer tercetosSize = TercetoManager.getTercetosSize();
+        nextBlockIndex = tercetosSize;
+        branchIndex = stack.pop();
+        TercetoManager.modificarSalto(branchIndex, "[" + nextBlockIndex + "]");
+    :};
+selection ::= IF OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET ELSE {:
+
+        Integer inconditionalBranchIndex = TercetoManager.crearTerceto("BI", "_");
+
+        Integer tercetosSize = TercetoManager.getTercetosSize();
+        elseBlockIndex = tercetosSize;
+        branchIndex = stack.pop();
+        TercetoManager.modificarSalto(branchIndex, "[" + nextBlockIndex + "]");
+
+        stack.push(inconditionalBranchIndex);
+    :}
+    OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {:
+        Integer tercetosSize = TercetoManager.getTercetosSize();
+        nextBlockIndex = tercetosSize;
+        Integer inconditionalBranchIndex = stack.pop();
+
+        TercetoManager.modificarSalto(inconditionalBranchIndex, "[" + nextBlockIndex + "]");
+    :};
+condition ::= NOT conditionElement {: TercetoManager.modificarOperador(branchIndex, branchOperator); stack.push(branchIndex); :};
+condition ::= conditionElement logicalConcat {:
+                 leftBranchIndex = branchIndex;
+                 if(concatOperator == "OR"){
+                    TercetoManager.modificarOperador(leftBranchIndex, branchOperator);
+                 }
+            :} conditionElement {:
+                Integer tercetosSize = TercetoManager.getTercetosSize();
+                thenBlockIndex = tercetosSize;
+                rightBranchIndex = branchIndex;
+                if(concatOperator == "OR") {
+                    TercetoManager.modificarSalto(leftBranchIndex, "[" + thenBlockIndex + "]");
+                    stack.push(rightBranchIndex);
+                }
+                else if(concatOperator == "AND") {
+                    stack.push(leftBranchIndex);
+                    stack.push(rightBranchIndex);
+                }
+            :};
+condition ::= conditionElement {: stack.push(branchIndex); :};
+conditionElement ::= expression {: leftSideExpressionIndex = ExpressionIndex; :}
+    logicalOperator expression {:
+        conditionElementIndex = TercetoManager.crearTerceto("CMP", "[" + leftSideExpressionIndex + "]", "[" + ExpressionIndex + "]");
+        branchIndex = TercetoManager.crearTerceto(branchOppositeOperator, "_");
+    :};
 
 // Logic Operators
 
-optional ::= AND {::};
-optional ::= OR {::};
-operator ::= EQUAL {::};
-operator ::= GREATER {::};
-operator ::= GREATER_EQ {::};
-operator ::= LESSER {::};
-operator ::= LESSER_EQ {::};
+logicalConcat ::= AND {: concatOperator = "AND"; :};
+logicalConcat ::= OR {: concatOperator = "OR"; :};
+logicalOperator ::= EQUAL {: branchOperator = "BE"; branchOppositeOperator = "BNE"; :};
+logicalOperator ::= GREATER {: branchOperator = "BGT"; branchOppositeOperator = "BLE"; :};
+logicalOperator ::= GREATER_EQ {:branchOperator = "BGE"; branchOppositeOperator = "BLT"; :};
+logicalOperator ::= LESSER {: branchOperator = "BLT"; branchOppositeOperator = "BGE"; :};
+logicalOperator ::= LESSER_EQ {: branchOperator = "BLE"; branchOppositeOperator = "BGT"; :};
+
 
 sentence ::= read {::};
 read ::= READ OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {::};

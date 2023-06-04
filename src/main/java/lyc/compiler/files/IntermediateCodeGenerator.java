@@ -13,14 +13,9 @@ public class IntermediateCodeGenerator implements FileGenerator {
     @Override
     public void generate(FileWriter fileWriter) throws IOException {
         // los tercetos
-        ArrayList<Terceto> tercetos = TercetoManager.tercetos;
-
-        // todo: necesitamos que se escriban los tercetos en un archivo
-        // puede ser como cada linea sea:
-        //      1 [ 'operador'| 'primer_operando' | 'segundo_operando' ]
-        //      2 [ 'operador'| __ | __ ]
-
-
-        fileWriter.write("TODO");
+        ArrayList<String> tercetos = TercetoManager.getTercetoString();
+        for(String tercetoStr : tercetos) {
+            fileWriter.write(tercetoStr+"\n");
+        }
     }
 }

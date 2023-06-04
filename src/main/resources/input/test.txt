@@ -3,66 +3,10 @@ init {
     variable1 : Int
     p1, p2, p3 : String
 }
-*- this is a comment -*
-a = 3.40
-b = .45
-c = 1.
-cadenaResultante = ConcatenarConRecorte("Hola", "Mundo", 2)
-p2 = "pepepepepepepepepepe"
-d = 340
 
-f = (a + b) / c
-
-ciclo (a > b) {
-    a = a + 1
-}
-
-if( a == b || a >= c ) {
+if( a > b ) {
     p1 = "a es igual a b, o a es mayor o igual a c"
     write(p1)
 }
-else {
-    p1 = "a no es igual a b, y a es menor que c"
-    write(p1)
-}
 
-if( a <= b & b == c){
-    a = c + 1
-}
-
-if (a == f) {
-  a = f + 1
-}
-
-ciclo(a>b & a>=c){
-   a = a + 1
-}
-
-if (a > b)
-{
-    if (a > b)
-    {
-        if (a > b)
-        {
-            write("a es mas grande que b")
-        }
-        else
-        {
-            write("a es mas chico o igual a b")
-        }
-    }
-}
-else
-{
-    write("a es mas chico o igual a b")
-}
-
-read(p2)
-p3 = p2
-
-*- a = "pruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebapruebaprueba" -*
-*- b = 9999999 -*
-*- a -*
-*- 123 -*
-*- if(a == 1 & b == 2 & c ==3) { a = 1 }-*
-*- for (a >= b || b == 2 & c == 3) { a = a + 1 } -*
+b = 1

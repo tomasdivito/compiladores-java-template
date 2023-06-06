@@ -209,6 +209,17 @@ type ::= RESERVED_STRING {:
 
 sentence ::= cycle {::};
 cycle ::= CYCLE OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+
+
+/* TODO
+
+Despues de CYCLE o OPEN_BRACKET guardar la cantidad de tercetos en una variable CycleStartIndex
+que va a tener tercetos size + 1
+
+Despues de condition crear un terceto con el salto al inicio de la condition
+
+*/
+
 //cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET {::};
 //cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
 

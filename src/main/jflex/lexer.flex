@@ -132,7 +132,21 @@ Comment = {OpenComment} [^"*-"] ~{CloseComment}
                                                   return symbol(ParserSym.INTEGER_CONSTANT, yytext());
                                              }
 
-  {FloatConstant}                          { return symbol(ParserSym.FLOAT_CONSTANT, yytext()); }
+  {FloatConstant}                          {
+                                                if (Float.valueOf(yytext()) > MAX_FLOAT || (Float.valueOf(yytext()) < MIN_FLOAT ) ) {
+                                                  throw new InvalidIntegerException("Float out of bounds.");
+                                                }
+
+                                                if (!SymbolTableManager.exists(yytext())) {
+                                                    SymbolEntry entry = new SymbolEntry(
+                                                          "_"+yytext(),
+                                                          DataType.FLOAT_CONST,
+                                                          yytext()
+                                                    );
+                                                    SymbolTableManager.insert(entry);
+                                                }
+
+                                                return symbol(ParserSym.FLOAT_CONSTANT, yytext()); }
   {StringConstant}                         {
                                                      stringBuffer = new StringBuffer(yytext());
 

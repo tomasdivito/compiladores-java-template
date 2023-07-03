@@ -51,6 +51,10 @@ action code {:
     private String BranchOppositeOperator = null;
     private String ConcatOperator = null;
 
+    private int LeftConcatStrIndex = 0;
+    private int RightConcatStrIndex = 0;
+    private int ConcatParamIndex = 0;
+
     private ArrayList<Terceto> tercetos = TercetoManager.tercetos;
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
     private ArrayList<String> VariableList = new ArrayList<String>();
@@ -155,7 +159,7 @@ sentence ::= concatSentence {::};
 concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParams CLOSE_BRACKET {:
     System.out.println("concat sentence");
 :};
-concatParams ::= IDENTIFIER COMA IDENTIFIER COMA concatIndexParam {::};
+concatParams ::= IDENTIFIER:id {: LeftConcatStrIndex = TercetoManager.crearTerceto() :} COMA IDENTIFIER COMA concatIndexParam {::};
 concatParams ::= IDENTIFIER COMA STRING_CONSTANT COMA concatIndexParam {::};
 concatParams ::= STRING_CONSTANT COMA IDENTIFIER COMA concatIndexParam {::};
 concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA concatIndexParam {::};
@@ -293,13 +297,13 @@ logicalOperator ::= LESSER_EQ {: BranchOperator = "BLE"; BranchOppositeOperator 
 
 
 sentence ::= read {::};
-read ::= READ OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {::};
-read ::= READ OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {::};
+read ::= READ OPEN_BRACKET IDENTIFIER:id CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", id.toString(), "_"); :};
+read ::= READ OPEN_BRACKET STRING_CONSTANT:cteStr CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", cteStr.toString(), "_"); :};
 
 
 sentence ::= write;
-write ::= WRITE OPEN_BRACKET IDENTIFIER CLOSE_BRACKET {: System.out.print("WRITE"); :};
-write ::= WRITE OPEN_BRACKET STRING_CONSTANT CLOSE_BRACKET {: System.out.print("WRITE"); :};
+write ::= WRITE OPEN_BRACKET IDENTIFIER:id CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", id.toString(), "_"); :};
+write ::= WRITE OPEN_BRACKET STRING_CONSTANT:cteStr CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", cteStr.toString(), "_"); :};
 
 
 /* ARITMETIC EXPRESSION */

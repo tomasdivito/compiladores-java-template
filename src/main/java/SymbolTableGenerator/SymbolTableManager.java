@@ -23,6 +23,12 @@ public class SymbolTableManager {
         entry.setValue(value);
     }
 
+    public static String getValue(String key) {
+        SymbolEntry entry = symbolTable.get(key);
+        String value = entry.getValue();
+        return value;
+    }
+
     public static void setLength(String key, String length) {
         SymbolEntry entry = symbolTable.get(key);
         entry.setLength(length);

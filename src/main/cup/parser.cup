@@ -51,9 +51,10 @@ action code {:
     private String BranchOppositeOperator = null;
     private String ConcatOperator = null;
 
-    private int LeftConcatStrIndex = 0;
-    private int RightConcatStrIndex = 0;
-    private int ConcatParamIndex = 0;
+    private String LeftConcatString = null;
+    private String RightConcatString = null;
+    private int ConcatIndex;
+    private int ConcatTercetoIndex;
 
     private ArrayList<Terceto> tercetos = TercetoManager.tercetos;
     private HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.symbolTable;
@@ -68,7 +69,6 @@ action code {:
 
     private String ConcatFirstString = null;
     private String ConcatSecondString = null;
-    private Integer ConcatIndex = null;
 
     private Stack<Integer> stack = new Stack<Integer>();
 :};
@@ -133,7 +133,7 @@ non terminal condition;
 non terminal selection;
 non terminal read;
 non terminal write;
-non terminal concatParams;
+non terminal concatParam;
 non terminal concatSentence;
 non terminal concatIndexParam;
 
@@ -156,26 +156,35 @@ block ::= sentence {::};
     private Integer ConcatIndex = null;
     **/
 sentence ::= concatSentence {::};
-concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParams CLOSE_BRACKET {:
-    System.out.println("concat sentence");
-:};
-concatParams ::= IDENTIFIER:id {: LeftConcatStrIndex = TercetoManager.crearTerceto() :} COMA IDENTIFIER COMA concatIndexParam {::};
-concatParams ::= IDENTIFIER COMA STRING_CONSTANT COMA concatIndexParam {::};
-concatParams ::= STRING_CONSTANT COMA IDENTIFIER COMA concatIndexParam {::};
-concatParams ::= STRING_CONSTANT COMA STRING_CONSTANT COMA concatIndexParam {::};
-concatIndexParam ::= IDENTIFIER:id {:
-    if (debug) {
-        System.out.println("Got concat index param identifier:" + id.toString());
-    }
-
-    if (SymbolTableManager.getType(id.toString()) != DataType.INTEGER_TYPE) {
-        System.out.println("Error, se esperaba un entero como indice para recorte");
-        System.exit(1);
-    }
-:};
-concatIndexParam ::= INTEGER_CONSTANT:cte {:
-
-:};
+concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParam COMA concatParam COMA INTEGER_CONSTANT:cte CLOSE_BRACKET {:
+                    Integer ConcatIndex = Integer.valueOf(cte.toString());
+                    String str1 = SymbolTableManager.getValue(LeftConcatString);
+                    str1 = str1.replaceAll("\"","").substring(ConcatIndex);
+                    String str2 = SymbolTableManager.getValue(RightConcatString);
+                    str2 = str2.replaceAll("\"","").substring(ConcatIndex);
+                    String result = str1 + str2;
+                    ConcatTercetoIndex = TercetoManager.crearTerceto(result, "_", "_");
+                :};
+concatParam ::= IDENTIFIER:id {:
+                if(SymbolTableManager.getType(id.toString()) != DataType.STRING_TYPE) {
+                    System.out.println("Error, se esperaba un string como parametro para recorte");
+                    System.exit(1);
+                }
+                if(LeftConcatString == null) {
+                    LeftConcatString = id.toString();
+                 }
+                else if(RightConcatString == null) {
+                    RightConcatString = id.toString();
+                }
+        :};
+concatParam ::= STRING_CONSTANT:cte {:
+                if(LeftConcatString == null) {
+                    LeftConcatString = cte.toString();
+                }
+                else if(RightConcatString == null) {
+                    RightConcatString = cte.toString();
+                }
+            :};
 
 // IINIT
 
@@ -345,7 +354,7 @@ assignment ::= IDENTIFIER:id ASSIG STRING_CONSTANT:str {:
     SymbolTableManager.setLength(id.toString(), Integer.toString(str.toString().length()));
 
 :};
-assignment ::= IDENTIFIER ASSIG concatSentence {: System.out.println("Assignment de concatenar cadena"); :};
+assignment ::= IDENTIFIER:id ASSIG concatSentence {: TercetoManager.crearTerceto("=", id.toString(), "[" + ConcatTercetoIndex + "]"); :};
 expression ::= expression PLUS term {:
     if (debug) {
         System.out.println("+");

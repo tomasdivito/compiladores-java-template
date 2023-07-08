@@ -11,20 +11,26 @@ public class TercetoManager {
 
     public static Integer crearTerceto(String operador, String primer_operando, String segundo_operando) {
         Terceto terceto = new Terceto(operador, primer_operando, segundo_operando);
+        Integer index = tercetos.size();
+        terceto.setIndex(index);
         tercetos.add(terceto);
-        return tercetos.size()-1;
+        return index;
     }
 
     public static Integer crearTerceto(String operando, String salto) {
         Terceto terceto = new Terceto(operando, salto);
+        Integer index = tercetos.size();
+        terceto.setIndex(index);
         tercetos.add(terceto);
-        return tercetos.size()-1;
+        return index;
     }
 
     public static Integer crearTerceto(String operando) {
         Terceto terceto = new Terceto(operando);
+        Integer index = tercetos.size();
+        terceto.setIndex(index);
         tercetos.add(terceto);
-        return tercetos.size()-1;
+        return index;
     }
 
     public static void modificarTerceto(Integer index, String primer_operando, String segundo_operando) {

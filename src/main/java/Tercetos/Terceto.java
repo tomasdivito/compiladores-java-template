@@ -1,6 +1,8 @@
 package Tercetos;
 
 public class Terceto {
+
+    private Integer index;
     private String operador;
     private String primer_operando;
     private String segundo_operando;
@@ -23,6 +25,8 @@ public class Terceto {
         this.segundo_operando = "_";
     }
 
+    public void setIndex(Integer index) { this.index = index; }
+
     public void setOperador(String operador) {
         this.operador = operador;
     }
@@ -34,6 +38,8 @@ public class Terceto {
     public void setSegundoOperando(String operando) {
         this.segundo_operando = operando;
     }
+
+    public Integer getIndex() { return this.index; }
 
     public String getOperador() {
         return this.operador;

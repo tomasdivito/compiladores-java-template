@@ -10,54 +10,18 @@ init {
     cadInput: String
 }
 
-a = 1
+p1 = 1.2
 b = 2
-c = 3
-p1 = 1.0
-p2 = 2.5
-p3 = 4.9
-cad1 = "Hello, "
-cad2 = "world"
+p2 = p1 + b
 
-*- variables declaradas con expresiones -*
-d = (a + b) / c
-e = d + 150
-p4 = (p1 * p3) - p2
+a = 3
 
-*- concatenar con recorte (caso especial) -*
-*- cad3 deberia quedar como "Hello, wo"? -*
-cad3 = ConcatenarConRecorte(cad1, cad2, 3)
+c = a * b
 
-write("cadena con recorte:")
-write(cad3)
+d = 3 + 1
 
-if (b > a) {
-    write("b es mayor que a")
-}
+e = a * b + c / d
 
-if (a > b) {
-    write("b no es mayor que a")
-} else {
-    write("b es mayor que a pero ahora con else")
-}
+e = a * b + (c - 1) / d
 
-if (not a == 0) {
-    if (not a == 0) {
-        if (a == 0) {
-            write("a es 0 con ifs anidados")
-        } else {
-            write("a no es 0 con ifs anidados")
-        }
-    }
-}
 
-ciclo (not c == 0) {
-    write("loop de ciclo")
-    c = c - 1
-}
-
-*- TODO: agregar ciclo anidado -*
-
-read(cadInput)
-write("cadena de entrada:")
-write(cadInput)

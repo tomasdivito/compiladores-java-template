@@ -5,6 +5,10 @@ import java.util.ArrayList;
 public class TercetoManager {
     public static ArrayList<Terceto> tercetos = new ArrayList<Terceto>();
 
+    public static ArrayList<Terceto> getTercetos() {
+        return tercetos;
+    }
+
     public static Integer crearTerceto(String operador, String primer_operando, String segundo_operando) {
         Terceto terceto = new Terceto(operador, primer_operando, segundo_operando);
         tercetos.add(terceto);

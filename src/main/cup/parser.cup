@@ -434,14 +434,14 @@ factor ::= INTEGER_CONSTANT:constant {:
         System.out.println("Integer constant: " + constant + " as a factor");
     }
 
-    FactorIndex = TercetoManager.crearTerceto(constant.toString());
+    FactorIndex = TercetoManager.crearTerceto("_"+constant.toString());
     FactorType = DataType.INTEGER_TYPE;
 :};
 factor ::= FLOAT_CONSTANT:constant {:
     if (debug) {
         System.out.println("Float constant: " + constant + " as a factor");
     }
-    FactorIndex = TercetoManager.crearTerceto(constant.toString());
+    FactorIndex = TercetoManager.crearTerceto("_"+constant.toString());
     FactorType = DataType.FLOAT_TYPE;
 :};
 factor ::= OPEN_BRACKET expression CLOSE_BRACKET {:

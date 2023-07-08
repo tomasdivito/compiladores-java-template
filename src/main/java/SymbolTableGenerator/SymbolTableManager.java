@@ -5,8 +5,8 @@ import java.util.HashMap;
 public class SymbolTableManager {
     public static HashMap<String, SymbolEntry> symbolTable = new HashMap<>();
 
-    public HashMap<String, SymbolEntry> getSymbolTable() {
-        return this.symbolTable;
+    public static HashMap<String, SymbolEntry> getSymbolTable() {
+        return symbolTable;
     }
 
     public static void insert(SymbolEntry entry) {

@@ -65,9 +65,12 @@ public class AsmCodeGenerator implements FileGenerator {
     }
 
     public static String generateCode() {
+        SymbolEntry symbol;
+        HashMap<String, SymbolEntry> symbolTable = SymbolTableManager.getSymbolTable();
         Stack<Integer> jumpStack = new Stack<>();
         Stack<Integer> jumpBIStack = new Stack<>();
         Integer jumpIndex = 0;
+        String label = "";
         String jumpLabel = "";
         String asmCode = ".CODE\n\n";
         asmCode += "START:\n";
@@ -75,7 +78,14 @@ public class AsmCodeGenerator implements FileGenerator {
         for(Terceto terceto : tercetos) {
             switch (terceto.getOperador()) {
                 case "=":
-                    asmCode += "\tfstp " + terceto.getPrimerOperando();
+                    System.out.println("INSIDE =");
+                    symbol = symbolTable.get(terceto.getPrimerOperando());
+                    if(symbol.getDataType() == DataType.STRING_TYPE || symbol.getDataType() == DataType.STRING_CONST) {
+                        asmCode += "\t STRCPY " + terceto.getPrimerOperando() + "," + symbol.getValue();
+                    }
+                    else {
+                        asmCode += "\tfstp " + terceto.getPrimerOperando();
+                    }
                     break;
                 case "+":
                     asmCode += "\tfadd";
@@ -99,90 +109,60 @@ public class AsmCodeGenerator implements FileGenerator {
                     jumpLabel = terceto.getPrimerOperando();
                     jumpLabel = jumpLabel.substring(1, jumpLabel.lastIndexOf("]"));
                     jumpIndex = Integer.valueOf(jumpLabel);
-                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1) {
+                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1 && jumpIndex >= tercetos.size()) {
                         jumpStack.push(jumpIndex);
                     }
-                    if(jumpIndex != tercetos.size()) {
-                        jumpLabel = "LABEL" + jumpLabel;
-                    }
-                    else {
-                        jumpLabel = "END START";
-                    }
+                    jumpLabel = "LABEL" + jumpLabel;
                     asmCode += "\tJE " + jumpLabel;
                     break;
                 case "BNE":
                     jumpLabel = terceto.getPrimerOperando();
                     jumpLabel = jumpLabel.substring(1, jumpLabel.lastIndexOf("]"));
                     jumpIndex = Integer.valueOf(jumpLabel);
-                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1) {
+                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1 && jumpIndex >= tercetos.size()) {
                         jumpStack.push(jumpIndex);
                     }
-                    if(jumpIndex != tercetos.size()) {
-                        jumpLabel = "LABEL" + jumpLabel;
-                    }
-                    else {
-                        jumpLabel = "END START";
-                    }
+                    jumpLabel = "LABEL" + jumpLabel;
                     asmCode += "\tJNE " + jumpLabel;
                     break;
                 case "BGT":
                     jumpLabel = terceto.getPrimerOperando();
                     jumpLabel = jumpLabel.substring(1, jumpLabel.lastIndexOf("]"));
                     jumpIndex = Integer.valueOf(jumpLabel);
-                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1) {
+                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1 && jumpIndex >= tercetos.size()) {
                         jumpStack.push(jumpIndex);
                     }
-                    if(jumpIndex != tercetos.size()) {
-                        jumpLabel = "LABEL" + jumpLabel;
-                    }
-                    else {
-                        jumpLabel = "END START";
-                    }
+                    jumpLabel = "LABEL" + jumpLabel;
                     asmCode += "\tJA " + jumpLabel;
                     break;
                 case "BGE":
                     jumpLabel = terceto.getPrimerOperando();
                     jumpLabel = jumpLabel.substring(1, jumpLabel.lastIndexOf("]"));
                     jumpIndex = Integer.valueOf(jumpLabel);
-                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1) {
+                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1 && jumpIndex >= tercetos.size()) {
                         jumpStack.push(jumpIndex);
                     }
-                    if(jumpIndex != tercetos.size()) {
-                        jumpLabel = "LABEL" + jumpLabel;
-                    }
-                    else {
-                        jumpLabel = "END START";
-                    }
+                    jumpLabel = "LABEL" + jumpLabel;
                     asmCode += "\tJAE " + jumpLabel;
                     break;
                 case "BLT":
                     jumpLabel = terceto.getPrimerOperando();
                     jumpLabel = jumpLabel.substring(1, jumpLabel.lastIndexOf("]"));
                     jumpIndex = Integer.valueOf(jumpLabel);
-                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1) {
+                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1 && jumpIndex >= tercetos.size()) {
                         jumpStack.push(jumpIndex);
                     }
-                    if(jumpIndex != tercetos.size()) {
-                        jumpLabel = "LABEL" + jumpLabel;
-                    }
-                    else {
-                        jumpLabel = "END START";
-                    }
+                    jumpLabel = "LABEL" + jumpLabel;
                     asmCode += "\tJB " + jumpLabel;
                     break;
                 case "BLE":
                     jumpLabel = terceto.getPrimerOperando();
                     jumpLabel = jumpLabel.substring(1, jumpLabel.lastIndexOf("]"));
                     jumpIndex = Integer.valueOf(jumpLabel);
-                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1) {
+                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1 && jumpIndex >= tercetos.size()) {
                         jumpStack.push(jumpIndex);
                     }
-                    if(jumpIndex != tercetos.size()) {
-                        jumpLabel = "LABEL" + jumpLabel;
-                    }
-                    else {
-                        jumpLabel = "END START";
-                    }
+                    jumpLabel = "LABEL" + jumpLabel;
                     asmCode += "\tJBE " + jumpLabel;
                     break;
                 case "BI":
@@ -207,20 +187,32 @@ public class AsmCodeGenerator implements FileGenerator {
                     jumpLabel = terceto.getPrimerOperando();
                     jumpLabel = jumpLabel.substring(1, jumpLabel.lastIndexOf("]"));
                     jumpIndex = Integer.valueOf(jumpLabel);
-                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1) {
+                    if(jumpStack.search(jumpIndex) == -1 && jumpBIStack.search(jumpIndex) == -1 && jumpIndex >= tercetos.size()) {
                         jumpBIStack.push(jumpIndex);
                     }
-                    if(jumpIndex != tercetos.size()) {
-                        jumpLabel = "LABEL" + jumpLabel;
-                    }
-                    else {
-                        jumpLabel = "END START";
-                    }
+                    jumpLabel = "LABEL" + jumpLabel;
                     asmCode += "\tJMP " + jumpLabel;
                     break;
                 case "WRITE":
+                    asmCode += "LABEL" + terceto.getIndex() + ":\n";
+                    symbol = symbolTable.get(terceto.getPrimerOperando());
+
+                    if(symbol == null) {
+                        System.exit(0);
+                    }
+
+                    if(symbol.getDataType() == DataType.STRING_CONST || symbol.getDataType() == DataType.STRING_TYPE) {
+                        asmCode += "displayString " + terceto.getPrimerOperando() + "\n";
+                    }
+                    else {
+                        asmCode += "DisplayFloat " + terceto.getPrimerOperando() + "," + 3 + "\n";
+                    }
+
+                    asmCode += "newLine";
                     break;
                 case "READ":
+                    asmCode += "LABEL" + terceto.getIndex() + ":\n";
+                    asmCode += "getString " + terceto.getPrimerOperando() + "\n";
                     break;
                 default:
                     if(!jumpStack.isEmpty()) {
@@ -241,12 +233,20 @@ public class AsmCodeGenerator implements FileGenerator {
                             jumpBIStack.push(jumpIndex);
                         }
                     }
-                    asmCode += "\tfld ";
-                    asmCode += terceto.getOperador();
+                    System.out.println("INSIDE DEFAULT");
+                    System.out.println(terceto.getIndex());
+                    symbol = symbolTable.get(terceto.getOperador());
+                    if(symbol.getDataType() != DataType.STRING_TYPE && symbol.getDataType() != DataType.STRING_CONST) {
+                        label = terceto.getIndex().toString();
+                        asmCode += "LABEL" + label + ":\n";
+                        asmCode += "\tfld ";
+                        asmCode += terceto.getOperador();
+                    }
                     break;
             }
             asmCode += "\n";
         }
+        asmCode += "LABEL" + tercetos.size() + ":\n";
         return asmCode;
     }
 }

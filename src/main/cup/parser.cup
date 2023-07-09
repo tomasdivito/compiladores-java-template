@@ -15,6 +15,7 @@ class Parser;
 action code {:
     private boolean debug = true;
     private int SentenceIndex = 0;
+    private int StringIndex = 0;
     private int AssignmentIndex = 0;
     private int ExpressionIndex = 0;
     private int TermIndex = 0;
@@ -30,6 +31,7 @@ action code {:
     private int NextBlockIndex = 0;
     private int CycleConditionIndex = 0;
     private int CycleBlockIndex = 0;
+    private int CycleStartIndex = 0;
     private int TrueBlockIndex = 0;
     private int ElseBlockIndex = 0;
     private int OptionalIndex = 0;
@@ -69,6 +71,7 @@ action code {:
 
     private String ConcatFirstString = null;
     private String ConcatSecondString = null;
+    private String concatResult = null;
 
     private Stack<Integer> stack = new Stack<Integer>();
 :};
@@ -162,7 +165,11 @@ concatSentence ::= RESERVED_CONCAT OPEN_BRACKET concatParam COMA concatParam COM
                     str1 = str1.replaceAll("\"","").substring(ConcatIndex);
                     String str2 = SymbolTableManager.getValue(RightConcatString);
                     str2 = str2.replaceAll("\"","").substring(ConcatIndex);
-                    String result = str1 + str2;
+                    concatResult = str1 + str2;
+                    Integer length = concatResult.length();
+                    String result = "_" + concatResult;
+                    SymbolEntry symbol = new SymbolEntry(result, DataType.STRING_CONST, "\""+concatResult+"\"", length.toString());
+                    SymbolTableManager.insert(symbol);
                     ConcatTercetoIndex = TercetoManager.crearTerceto(result, "_", "_");
                 :};
 concatParam ::= IDENTIFIER:id {:
@@ -221,20 +228,16 @@ type ::= RESERVED_STRING {:
 // CYCLE
 
 sentence ::= cycle {::};
-cycle ::= CYCLE OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+cycle ::= CYCLE {:
+            CycleStartIndex = TercetoManager.getTercetosSize();
+        :} OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {:
+            TercetoManager.crearTerceto("BI", "[" + CycleStartIndex + "]");
 
-
-/* TODO
-
-Despues de CYCLE o OPEN_BRACKET guardar la cantidad de tercetos en una variable CycleStartIndex
-que va a tener tercetos size + 1
-
-Despues de condition crear un terceto con el salto al inicio de la condition
-
-*/
-
-//cycleCondition ::= OPEN_BRACKET condition CLOSE_BRACKET {::};
-//cycleBlock ::= OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {::};
+            Integer tercetosSize = TercetoManager.getTercetosSize();
+            NextBlockIndex = tercetosSize;
+            BranchIndex = stack.pop();
+            TercetoManager.modificarSalto(BranchIndex, "[" + NextBlockIndex + "]");
+        :};
 
 // IF
 
@@ -242,8 +245,10 @@ sentence ::= selection {::};
 selection ::= IF OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET {:
         Integer tercetosSize = TercetoManager.getTercetosSize();
         NextBlockIndex = tercetosSize;
-        BranchIndex = stack.pop();
-        TercetoManager.modificarSalto(BranchIndex, "[" + NextBlockIndex + "]");
+        while(!stack.isEmpty()) {
+            BranchIndex = stack.pop();
+            TercetoManager.modificarSalto(BranchIndex, "[" + NextBlockIndex + "]");
+        }
     :};
 selection ::= IF OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block CLOSE_CURLY_BRACKET ELSE {:
 
@@ -251,8 +256,10 @@ selection ::= IF OPEN_BRACKET condition CLOSE_BRACKET OPEN_CURLY_BRACKET block C
 
         Integer tercetosSize = TercetoManager.getTercetosSize();
         ElseBlockIndex = tercetosSize;
-        BranchIndex = stack.pop();
-        TercetoManager.modificarSalto(BranchIndex, "[" + ElseBlockIndex + "]");
+        while(!stack.isEmpty()) {
+            BranchIndex = stack.pop();
+            TercetoManager.modificarSalto(BranchIndex, "[" + ElseBlockIndex + "]");
+        }
 
         stack.push(inconditionalBranchIndex);
     :}
@@ -307,12 +314,12 @@ logicalOperator ::= LESSER_EQ {: BranchOperator = "BLE"; BranchOppositeOperator 
 
 sentence ::= read {::};
 read ::= READ OPEN_BRACKET IDENTIFIER:id CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", id.toString(), "_"); :};
-read ::= READ OPEN_BRACKET STRING_CONSTANT:cteStr CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", cteStr.toString(), "_"); :};
+read ::= READ OPEN_BRACKET STRING_CONSTANT:cteStr CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", "_"+cteStr.toString().replace("\"","").replace(" ","_"), "_"); :};
 
 
 sentence ::= write;
 write ::= WRITE OPEN_BRACKET IDENTIFIER:id CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", id.toString(), "_"); :};
-write ::= WRITE OPEN_BRACKET STRING_CONSTANT:cteStr CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", cteStr.toString(), "_"); :};
+write ::= WRITE OPEN_BRACKET STRING_CONSTANT:cteStr CLOSE_BRACKET {: TercetoManager.crearTerceto("WRITE", "_"+cteStr.toString().replace("\"","").replace(" ","_"), "_"); :};
 
 
 /* ARITMETIC EXPRESSION */
@@ -342,7 +349,8 @@ assignment ::= IDENTIFIER:id ASSIG STRING_CONSTANT:str {:
         System.out.println("Assignment");
     }
 
-    AssignmentIndex = TercetoManager.crearTerceto("=", id.toString(), str.toString());
+    StringIndex = TercetoManager.crearTerceto("_"+str.toString().replace("\"",""), "_", "_");
+    AssignmentIndex = TercetoManager.crearTerceto("=", id.toString(), "[" + StringIndex + "]");
 
     DataType type = SymbolTableManager.getType(id.toString());
     if (type != DataType.STRING_TYPE) {
@@ -354,7 +362,10 @@ assignment ::= IDENTIFIER:id ASSIG STRING_CONSTANT:str {:
     SymbolTableManager.setLength(id.toString(), Integer.toString(str.toString().length()));
 
 :};
-assignment ::= IDENTIFIER:id ASSIG concatSentence {: TercetoManager.crearTerceto("=", id.toString(), "[" + ConcatTercetoIndex + "]"); :};
+assignment ::= IDENTIFIER:id ASSIG concatSentence {:
+                SymbolTableManager.setValue(id.toString(), "\""+concatResult+"\"");
+                TercetoManager.crearTerceto("=", id.toString(), "[" + ConcatTercetoIndex + "]");
+            :};
 expression ::= expression PLUS term {:
     if (debug) {
         System.out.println("+");
